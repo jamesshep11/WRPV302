@@ -18,6 +18,8 @@ public class MainActivity extends AppCompatActivity {
     TextView txtPlayer2Score;
     String[][] grid = new String[5][5];
 
+    int turnCount = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,10 +78,54 @@ public class MainActivity extends AppCompatActivity {
 
         String tile = activeTile.getTag().toString();
         grid[Integer.parseInt(String.valueOf(tile.charAt(0)))][Integer.parseInt(String.valueOf(tile.charAt(1)))] = activeTile.getText().toString();
+        turnCount++;
+
+        int points = findMatches(tile);
+
+        if (points > 0)
+            if (txtCurrentPlayer.getText().toString().equals("Player 1")) {
+                points += Integer.parseInt(txtPlayer1Score.getText().toString());
+                txtPlayer1Score.setText(points);
+            } else {
+                points += Integer.parseInt(txtPlayer2Score.getText().toString());
+                txtPlayer2Score.setText(points);
+            }
+        else if(!isFinished())
+            nextPlayer();
+        else
+            finishGame();
 
         activeTile.setClickable(false);
         activeTile = null;
-        nextPlayer();
+    }
+
+    private void finishGame(){
+        int score1 = Integer.parseInt(txtPlayer1Score.getText().toString());
+        int score2 = Integer.parseInt(txtPlayer2Score.getText().toString());
+
+        String message;
+        if (score1 > score2)
+            message = "Player 1 is the WINNER!!!";
+        else if (score1 < score2)
+            message = "Player 2 is the WINNER!!!";
+        else
+            message = "It's a DRAW!!!";
+
+        new AlertDialog.Builder(this)
+                .setTitle("Congratulations")
+                .setMessage(message)
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                })
+                .show();
+    }
+
+    private boolean isFinished(){
+        if (turnCount >= 25)
+            return true;
+
+        return false;
     }
 
     private void nextPlayer(){
