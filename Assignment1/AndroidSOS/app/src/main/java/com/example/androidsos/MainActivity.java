@@ -10,6 +10,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.util.Arrays;
+
 public class MainActivity extends AppCompatActivity {
 
     Button activeTile = null;
@@ -31,6 +33,9 @@ public class MainActivity extends AppCompatActivity {
         txtPlayer1Score.setText("0");
         txtPlayer2Score = findViewById(R.id.txtPlayer2Score);
         txtPlayer2Score.setText("0");
+
+        for (String[] x : grid)
+            Arrays.fill(x, "");
     }
 
     public void onInstructionsClicked(View view){
@@ -85,14 +90,15 @@ public class MainActivity extends AppCompatActivity {
         if (points > 0)
             if (txtCurrentPlayer.getText().toString().equals("Player 1")) {
                 points += Integer.parseInt(txtPlayer1Score.getText().toString());
-                txtPlayer1Score.setText(points);
+                txtPlayer1Score.setText(String.valueOf(points));
             } else {
                 points += Integer.parseInt(txtPlayer2Score.getText().toString());
-                txtPlayer2Score.setText(points);
+                txtPlayer2Score.setText(String.valueOf(points));
             }
-        else if(!isFinished())
-            nextPlayer();
         else
+            nextPlayer();
+
+        if (isFinished())
             finishGame();
 
         activeTile.setClickable(false);
@@ -151,8 +157,8 @@ public class MainActivity extends AppCompatActivity {
 
     private int checkS(String pos){
         int points = 0;
-        int y = Integer.parseInt(String.valueOf(pos.charAt(0)));
-        int x = Integer.parseInt(String.valueOf(pos.charAt(1)));
+        int x = Integer.parseInt(String.valueOf(pos.charAt(0)));
+        int y = Integer.parseInt(String.valueOf(pos.charAt(1)));
 
         //Check left
         if (x-2 >= 0 && grid[x - 1][y].equals("O"))
@@ -180,17 +186,17 @@ public class MainActivity extends AppCompatActivity {
                 points++;
 
         //Check UpRight
-        if (x+2 <= 5 && y-2 <= 0 && grid[x + 1][y - 1].equals("O"))
+        if (x+2 <= 4 && y-2 >= 0 && grid[x + 1][y - 1].equals("O"))
             if (grid[x + 2][y - 2].equals("S"))
                 points++;
 
         //Check DownLeft
-        if (x-2 <= 0 && y+2 >= 5 && grid[x - 1][y + 1].equals("O"))
+        if (x-2 >= 0 && y+2 <= 4 && grid[x - 1][y + 1].equals("O"))
             if (grid[x - 2][y + 2].equals("S"))
                 points++;
 
         //Check DownLeft
-        if (x+2 >= 5 && y+2 >= 5 && grid[x + 1][y + 1].equals("O"))
+        if (x+2 <= 4 && y+2 <= 4 && grid[x + 1][y + 1].equals("O"))
             if (grid[x + 2][y + 2].equals("S"))
                 points++;
 
@@ -200,27 +206,27 @@ public class MainActivity extends AppCompatActivity {
 
     private int checkO(String pos){
         int points = 0;
-        int y = Integer.parseInt(String.valueOf(pos.charAt(0)));
-        int x = Integer.parseInt(String.valueOf(pos.charAt(1)));
+        int x = Integer.parseInt(String.valueOf(pos.charAt(0)));
+        int y = Integer.parseInt(String.valueOf(pos.charAt(1)));
 
         //Check X
         if (x-1 >= 0 && grid[x - 1][y].equals("S"))
-            if (x+1 <= 5 && grid[x + 1][y].equals("S"))
+            if (x+1 <= 4 && grid[x + 1][y].equals("S"))
                 points++;
 
         //Check Y
         if (y-1 >= 0 && grid[x][y - 1].equals("S"))
-            if (y+1 <= 5 && grid[x][y + 1].equals("S"))
+            if (y+1 <= 4 && grid[x][y + 1].equals("S"))
                 points++;
 
         //Check DiagLeft
         if (x-1 >= 0 && y-1 >= 0 && grid[x - 1][y - 1].equals("S"))
-            if (x+1 >= 5 && y+1 >= 5 && grid[x + 1][y + 1].equals("S"))
+            if (x+1 <= 4 && y+1 <= 4 && grid[x + 1][y + 1].equals("S"))
                 points++;
 
         //Check DiagRight
-        if (x+1 <= 5 && y-1 <= 0 && grid[x + 1][y - 1].equals("S"))
-            if (x-1 <= 0 && y+1 >= 5 && grid[x - 1][y + 1].equals("S"))
+        if (x+1 <= 4 && y-1 >= 0 && grid[x + 1][y - 1].equals("S"))
+            if (x-1 >= 0 && y+1 <= 4 && grid[x - 1][y + 1].equals("S"))
                 points++;
 
 
