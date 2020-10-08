@@ -14,19 +14,20 @@ import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity {
 
-    Button activeTile = null;
-    TextView txtCurrentPlayer;
-    TextView txtPlayer1Score;
-    TextView txtPlayer2Score;
-    String[][] grid = new String[5][5];
+    Button activeTile = null;           // The tile being changed
+    TextView txtCurrentPlayer;          //
+    TextView txtPlayer1Score;           // Reference to the text views that will change
+    TextView txtPlayer2Score;           //
+    String[][] grid = new String[5][5]; // 2D array track the tile values. Easier to search for SOS sequences.
 
-    int turnCount = 0;
+    int turnCount = 0;                  // Counts the number of turns taken. 25 turns => game over
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //Set initial TextView values
         txtCurrentPlayer = findViewById(R.id.txtCurrentPlayer);
         txtCurrentPlayer.setText(R.string.Player1);
         txtPlayer1Score = findViewById(R.id.txtPlayer1Score);
@@ -34,16 +35,20 @@ public class MainActivity extends AppCompatActivity {
         txtPlayer2Score = findViewById(R.id.txtPlayer2Score);
         txtPlayer2Score.setText("0");
 
+        // Initialize 2D array (we don't want null values)
         for (String[] x : grid)
             Arrays.fill(x, "");
     }
 
+    // Launch Instructions activity
     public void onInstructionsClicked(View view){
         Intent intent = new Intent(this, Instructions.class);
         startActivity(intent);
     }
 
+    // Change value of tile when clicked
     public void onTileClicked(View view){
+        // Check if player has already changed another tile
         if (activeTile != null && activeTile != view){
             new AlertDialog.Builder(this)
                     .setTitle("Hold Up")
@@ -56,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
+        // Player hasn't changed any other tiles yet. This change is legal.
         activeTile = (Button) view;
         switch(activeTile.getText().toString()){
             case "": activeTile.setText("S");
@@ -68,10 +74,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // End turn
     public void onDoneClicked(View view){
+        // Ensure the player has made changes. Can't skip turn.
         if (activeTile == null){
             new AlertDialog.Builder(this)
-                    .setTitle("What's worng?")
+                    .setTitle("What's wrong?")
                     .setMessage("You didn't make any changes. Don't give up now.")
                     .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {}
@@ -81,12 +89,15 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
+        // Get position of tile from Tag property and update 2D array
         String tile = activeTile.getTag().toString();
         grid[Integer.parseInt(String.valueOf(tile.charAt(0)))][Integer.parseInt(String.valueOf(tile.charAt(1)))] = activeTile.getText().toString();
         turnCount++;
 
+        // Check for SOS sequences
         int points = findMatches(tile);
 
+        // Did player score? Yes => Go again, No => Next player
         if (points > 0)
             if (txtCurrentPlayer.getText().toString().equals("Player 1")) {
                 points += Integer.parseInt(txtPlayer1Score.getText().toString());
@@ -98,17 +109,22 @@ public class MainActivity extends AppCompatActivity {
         else
             nextPlayer();
 
+        // Is the game over?
         if (isFinished())
             finishGame();
 
+        // Deactivate tile so it can't be changed
         activeTile.setClickable(false);
         activeTile = null;
     }
 
+    // Calculate and display the winner
     private void finishGame(){
+        // Get each player's score
         int score1 = Integer.parseInt(txtPlayer1Score.getText().toString());
         int score2 = Integer.parseInt(txtPlayer2Score.getText().toString());
 
+        // Calculate the winner
         String message;
         if (score1 > score2)
             message = "Player 1 is the WINNER!!!";
@@ -117,6 +133,7 @@ public class MainActivity extends AppCompatActivity {
         else
             message = "It's a DRAW!!!";
 
+        // Display the winner
         new AlertDialog.Builder(this)
                 .setTitle("Congratulations")
                 .setMessage(message)
@@ -127,6 +144,7 @@ public class MainActivity extends AppCompatActivity {
                 .show();
     }
 
+    // Is the game over?
     private boolean isFinished(){
         if (turnCount >= 25)
             return true;
@@ -134,6 +152,7 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
+    // Switch to the next player
     private void nextPlayer(){
         switch (txtCurrentPlayer.getText().toString()){
             case "Player 1": txtCurrentPlayer.setText(R.string.Player2);
@@ -143,18 +162,20 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // Check for SOS sequences and calculate points scored
     private int findMatches(String pos){
         int points = 0;
-        String currentText = activeTile.getText().toString();
+        String currentText = activeTile.getText().toString();   // Did user enter S or O
 
         if (currentText == "S")
-            points +=  checkS(pos);
+            points +=  checkS(pos); // Player entered S
         else
-            points += checkO(pos);
+            points += checkO(pos);  // Player entered O
 
         return points;
     }
 
+    // Check for SOS sequences if S was entered
     private int checkS(String pos){
         int points = 0;
         int x = Integer.parseInt(String.valueOf(pos.charAt(0)));
@@ -204,17 +225,18 @@ public class MainActivity extends AppCompatActivity {
         return points;
     }
 
+    // Check for SOS sequences if O was entered
     private int checkO(String pos){
         int points = 0;
         int x = Integer.parseInt(String.valueOf(pos.charAt(0)));
         int y = Integer.parseInt(String.valueOf(pos.charAt(1)));
 
-        //Check X
+        //Check horizontal
         if (x-1 >= 0 && grid[x - 1][y].equals("S"))
             if (x+1 <= 4 && grid[x + 1][y].equals("S"))
                 points++;
 
-        //Check Y
+        //Check vertical
         if (y-1 >= 0 && grid[x][y - 1].equals("S"))
             if (y+1 <= 4 && grid[x][y + 1].equals("S"))
                 points++;
