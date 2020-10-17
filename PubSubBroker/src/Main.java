@@ -1,4 +1,5 @@
-package PubSubBroker;
+import PubSubBroker.Broker;
+import PubSubBroker.Subscriber;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -7,22 +8,24 @@ public class Main {
 
     public Main() {
         // Get the broker.
-        PubSubBroker broker = PubSubBroker.getInstance();
+        Broker broker = Broker.getInstance();
 
-        // Some subscribers.
+        //region Create some subscribers.
         Subscriber s01 = (publisher, topic, params)
                 -> System.out.printf("s01: %s message received.\n", topic);
         Subscriber s02 = (publisher, topic, params)
                 -> System.out.printf("s02: Hello %s message received. Extra = %d\n",
                 params.get("name"), params.get("extra"));
+        //endregion
 
-        // Subscribe for some topics.
+        //region Subscribe to some topics.
         System.out.println("Subscribing...");
-        broker.subscribe("hello", s01);
-        broker.subscribe("hello", s02);
-        broker.subscribe("goodbye", s01);
+        broker.subscribe(s01, "hello");
+        broker.subscribe(s02, "hello");
+        broker.subscribe(s01, "goodbye");
+        //endregion
 
-        // Publishing
+        //region Publishing
         System.out.println("Publishing...");
         Map<String, Object> params = new HashMap<>();
         params.put("name", "Bob");
@@ -30,7 +33,8 @@ public class Main {
 
         broker.publish(this, "hello", params);
         broker.publish(this, "goodbye", null);
-
+        //endregion
+        
         System.out.println("Unsubscribing s01...");
         broker.unsubscribe(s01);
 
