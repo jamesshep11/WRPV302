@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Android SOS</string>
+    <string name="app_title">SOS</string>
+    <string name="Player1">Player 1</string>
+    <string name="Player2">Player 2</string>
+    <string name="done">Done</string>
+    <string name="btnInstructions">Instructions</string>
+    <string name="Instructions">Press a tile once to select an S\n\n
+    Press the tile again to select an O and again to clear the tile\n\n
+    Once you have selected an S or O click the \'Done\' button to finish your turn</string>
+</resources>

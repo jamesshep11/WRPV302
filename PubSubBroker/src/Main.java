@@ -34,7 +34,7 @@ public class Main {
         broker.publish(this, "hello", params);
         broker.publish(this, "goodbye", null);
         //endregion
-        
+
         System.out.println("Unsubscribing s01...");
         broker.unsubscribe(s01);
 
