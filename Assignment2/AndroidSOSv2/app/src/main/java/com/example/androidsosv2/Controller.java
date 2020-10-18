@@ -1,5 +1,6 @@
 package com.example.androidsosv2;
 
+import android.app.Application;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.view.View;
@@ -15,135 +16,85 @@ import PubSubBroker.Broker;
 import PubSubBroker.Subscriber;
 
 public class Controller {
-    private Context mainActivityContext;                //Context of main activity
-    private Broker broker = Broker.getInstance();       //Broker instance
+    private Context mainActivityContext;                // Context of main activity
+    private Broker broker = Broker.getInstance();       // Broker instance
+    private Player player1;
+    private Player player2;
 
-    private Button activeTile = null;                   // The tile being changed
-    private String currentPlayer;
-    private int player1Score, player2Score;             // Track players' scores
+    private Player currentPlayer;
     private String[][] grid = new String[5][5];         // 2D array track the tile values. Easier to search for SOS sequences.
     private int turnCount;                              // Counts the number of turns taken. 25 turns => game over
 
-    public Controller(Context context) {
+    Controller(Context context) {
         mainActivityContext = context;
-        currentPlayer = "Player 1";
-        player1Score = 0;
-        player2Score = 0;
+
+        loadSubscribers();
+    }
+
+    private void onStartGame(){
+        player1 = new Player("Player 1");
+        player2 = new Player("Player 2");
+
+        if (currentPlayer != player1)
+            nextPlayer();
         turnCount = 0;
 
         // Initialize 2D array (we don't want null values)
         for (String[] x : grid)
             Arrays.fill(x, "");
-
-        loadSubscribers();
     }
 
     private void loadSubscribers(){
-        Subscriber tileClicked = (publisher, topic, params)
-                -> tileClicked((View) publisher);
         Subscriber turnOver = (publisher, topic, params)
-                -> onDoneClicked();
+                -> onTurnOver((String)params.get("tilePos"), (String)params.get("letter"));
+        Subscriber newGame = (publisher, topic, params)
+                -> onStartGame();
 
-        broker.subscribe(tileClicked, "tileClicked");
         broker.subscribe(turnOver, "turnOver");
+        broker.subscribe(newGame, "newGame");
     }
 
-    // Change value of tile when clicked
-    private void tileClicked(View view){
-            // Check if player has already changed another tile
-            if (activeTile != null && activeTile != view){
-                new AlertDialog.Builder(mainActivityContext)
-                        .setTitle("Hold Up")
-                        .setMessage("You can only change one tile per turn")
-                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {}
-                        })
-                        .setIcon(android.R.drawable.ic_dialog_alert)
-                        .show();
-                return;
-            }
-
-            // Player hasn't changed any other tiles yet. This change is legal.
-            activeTile = (Button) view;
-            switch(activeTile.getText().toString()){
-                case "": activeTile.setText("S");
-                    break;
-                case "S": activeTile.setText("O");
-                    break;
-                case "O": activeTile.setText("");
-                    activeTile = null;
-                    break;
-            }
-    }
-
-    private void onDoneClicked(){
-        // Ensure the player has made changes. Can't skip turn.
-        if (activeTile == null){
-            new AlertDialog.Builder(mainActivityContext)
-                    .setTitle("What's wrong?")
-                    .setMessage("You didn't make any changes. Don't give up now.")
-                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {}
-                    })
-                    .setIcon(android.R.drawable.ic_dialog_alert)
-                    .show();
-            return;
-        }
-
-        // Get position of tile from Tag property and update 2D array
-        String tile = activeTile.getTag().toString();
-        grid[Integer.parseInt(String.valueOf(tile.charAt(0)))][Integer.parseInt(String.valueOf(tile.charAt(1)))] = activeTile.getText().toString();
+    private void onTurnOver(String tilePos, String letter){
+        // Update 2D array
+        grid[Integer.parseInt(String.valueOf(tilePos.charAt(0)))][Integer.parseInt(String.valueOf(tilePos.charAt(1)))] = letter;
         turnCount++;
 
         // Check for SOS sequences
-        int pointsScored = findMatches(tile);
+        int pointsScored = findMatches(tilePos, letter);
 
         // Did player score? Yes => Go again, No => Next player
-        if (pointsScored > 0)
-            if (currentPlayer.equals("Player 1")) {
-                player1Score += pointsScored;
-                Map<String, Object> params = new HashMap<>();
-                params.put("score", Integer.toString(player1Score));
-                broker.publish(this, "player1Scored", params);
-            } else {
-                player2Score += pointsScored;
-                Map<String, Object> params = new HashMap<>();
-                params.put("score", Integer.toString(player2Score));
-                broker.publish(this, "player2Scored", params);
-            }
+        if (pointsScored > 0) {
+            Map<String, Object> params = new HashMap<>();
+            params.put("score", pointsScored);
+            broker.publish(currentPlayer, "playerScored", params);
+        }
         else
             nextPlayer();
 
         // Is the game over?
         if (isFinished())
             finishGame();
-
-        // Deactivate tile so it can't be changed
-        activeTile.setClickable(false);
-        activeTile = null;
     }
 
     // Switch to the next player
     private void nextPlayer(){
-        switch (currentPlayer){
-            case "Player 1": currentPlayer = "Player 2";
-                break;
-            case "Player 2": currentPlayer = "Player 1";
-                break;
-        }
+        if (currentPlayer == player1)
+            currentPlayer = player2;
+        else
+            currentPlayer = player1;
 
         Map<String, Object> params = new HashMap<>();
-        params.put("currentPlayer", currentPlayer);
+        params.put("currentPlayer", currentPlayer.toString());
         broker.publish(this, "nextPlayer", params);
     }
 
     // Check for SOS sequences and calculate points scored
-    private int findMatches(String pos){
+    private int findMatches(String pos, String letter){
         int points = 0;
-        String currentText = activeTile.getText().toString();   // Did user enter S or O
 
-        if (currentText.equals("S"))
-            points +=  checkS(pos); // Player entered S
+        // Did user enter S or O
+        if (letter.equals("S"))
+            points += checkS(pos); // Player entered S
         else
             points += checkO(pos);  // Player entered O
 
@@ -238,9 +189,9 @@ public class Controller {
     private void finishGame(){
         // Calculate the winner
         String message;
-        if (player1Score > player2Score)
+        if (player1.getScore() > player2.getScore())
             message = "Player 1 is the WINNER!!!";
-        else if (player1Score < player2Score)
+        else if (player1.getScore() < player2.getScore())
             message = "Player 2 is the WINNER!!!";
         else
             message = "It's a DRAW!!!";
@@ -251,6 +202,7 @@ public class Controller {
                 .setMessage(message)
                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
+                        broker.publish(this, "newGame", null);
                     }
                 })
                 .show();
