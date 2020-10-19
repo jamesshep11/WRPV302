@@ -1,6 +1,7 @@
 package com.example.contacts;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +10,8 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
 
@@ -35,6 +38,20 @@ class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
         holder.contactName.setText(contacts.get(position).getName());
         holder.contactNumber.setText(contacts.get(position).getNumber());
         holder.contactImage.setImageResource(contacts.get(position).getImage());
+
+        holder.contactImage.setOnClickListener(view -> {
+            holder.editButton.setVisibility(View.VISIBLE);
+            holder.chatButton.setVisibility(View.VISIBLE);
+            holder.callButton.setVisibility(View.VISIBLE);
+        });
+
+        holder.editButton.setOnClickListener(view -> {
+            Intent contactActivity = new Intent(context, ContactCard.class);
+            contactActivity.putExtra("contactName", contacts.get(position).getName());
+            contactActivity.putExtra("contactNumber", contacts.get(position).getNumber());
+            contactActivity.putExtra("contactImage", contacts.get(position).getImage());
+            context.startActivity(contactActivity);
+        });
     }
 
     @Override
@@ -46,12 +63,16 @@ class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
         // each data item is just a string in this case
         TextView contactName, contactNumber;
         ImageView contactImage;
+        FloatingActionButton editButton, chatButton, callButton;
 
         public MyViewHolder(View parentView) {
             super(parentView);
             contactName = parentView.findViewById(R.id.contactNumber);
             contactNumber = parentView.findViewById(R.id.contactName);
             contactImage = parentView.findViewById(R.id.contactImage);
+            editButton = parentView.findViewById(R.id.editButton);
+            chatButton = parentView.findViewById(R.id.chatButton);
+            callButton = parentView.findViewById(R.id.callButton);
         }
     }
 }

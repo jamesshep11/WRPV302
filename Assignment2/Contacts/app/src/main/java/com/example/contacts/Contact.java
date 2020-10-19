@@ -3,9 +3,9 @@ package com.example.contacts;
 import android.media.Image;
 
 public class Contact {
-    String name;
-    String number;
-    int image;
+    private String name;
+    private String number;
+    private int image;
 
     public Contact(String name, String number, int image) {
         this.name = name;
