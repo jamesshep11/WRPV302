@@ -1,13 +1,19 @@
 package com.example.contacts;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.collection.ArraySet;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.View;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class ContactList extends AppCompatActivity {
 
@@ -21,8 +27,6 @@ public class ContactList extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contact_list);
-
-        CreateContacts();
 
         recyclerView = findViewById(R.id.rvContacts);
 
@@ -39,9 +43,29 @@ public class ContactList extends AppCompatActivity {
         recyclerView.setAdapter(mAdapter);
     }
 
-    private void CreateContacts(){
-        for (int x = 0; x <= 5; x++){
-            contacts.add(new Contact("Random", "00000", R.drawable.download));
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        contacts.clear();
+
+        // Load saved contact information
+
+        // Get info from shared preferences
+        SharedPreferences preferenceNames = getSharedPreferences("contactNames", MODE_PRIVATE);
+        SharedPreferences preferenceNumbers = getSharedPreferences("contactNumbers", MODE_PRIVATE);
+        SharedPreferences preferenceImages = getSharedPreferences("contactImages", MODE_PRIVATE);
+
+        // load info into global contacts list
+        for (int x = 0; x < preferenceNames.getAll().size(); x++){
+            String pos = Integer.toString(x);
+            Contact newContact = new Contact(preferenceNames.getString(pos, ""), preferenceNumbers.getString(pos, ""), preferenceImages.getInt(pos, R.drawable.avatar_01));
+            contacts.add(newContact);
         }
+    }
+
+    public void onNewContactClicked(View view){
+        Intent contactActivity = new Intent(this, ContactCard.class);
+        startActivity(contactActivity);
     }
 }

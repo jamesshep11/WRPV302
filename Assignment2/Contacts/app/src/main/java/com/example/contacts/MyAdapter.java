@@ -47,9 +47,7 @@ class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
 
         holder.editButton.setOnClickListener(view -> {
             Intent contactActivity = new Intent(context, ContactCard.class);
-            contactActivity.putExtra("contactName", contacts.get(position).getName());
-            contactActivity.putExtra("contactNumber", contacts.get(position).getNumber());
-            contactActivity.putExtra("contactImage", contacts.get(position).getImage());
+            contactActivity.putExtra("position", position);
             context.startActivity(contactActivity);
         });
     }

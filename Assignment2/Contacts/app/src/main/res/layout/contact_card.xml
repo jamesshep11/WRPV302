@@ -24,17 +24,18 @@
                 android:id="@+id/contactImage"
                 android:layout_width="370dp"
                 android:layout_height="370dp"
+                android:background="#2196F3"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:srcCompat="@tools:sample/avatars" />
+                tools:srcCompat="@drawable/avatar_01" />
 
             <TextView
                 android:id="@+id/contactNumber"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:background="#702196F3"
+                android:background="#A6FFFFFF"
                 android:paddingLeft="10dp"
                 android:text="TextView"
                 android:textAppearance="@style/TextAppearance.AppCompat.Large"
@@ -47,7 +48,7 @@
                 android:id="@+id/contactName"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:background="#702196F3"
+                android:background="#A6FFFFFF"
                 android:paddingLeft="10dp"
                 android:text="TextView"
                 android:textAppearance="@style/TextAppearance.AppCompat.Display1"
