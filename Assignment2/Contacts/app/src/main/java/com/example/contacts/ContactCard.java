@@ -1,20 +1,22 @@
 package com.example.contacts;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.collection.ArraySet;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import java.util.Set;
+import android.widget.Toast;
 
 public class ContactCard extends AppCompatActivity {
 
     TextView contactName, contactNumber;
     ImageView contactImage;
+
+    boolean saved;
 
     private int position;
 
@@ -22,6 +24,8 @@ public class ContactCard extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contact_card);
+
+        saved = false;
 
         // Get reference to UI components
         contactName = findViewById(R.id.contactName);
@@ -40,9 +44,23 @@ public class ContactCard extends AppCompatActivity {
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
+    public void onBackPressed() {
+        if(!saved)
+            new AlertDialog.Builder(this)
+                    .setTitle("Save changes")
+                    .setMessage("Would you like to save these changes?")
+                    .setPositiveButton("Save", (dialogInterface, i) -> {
+                        onSaveClicked(null);
+                        super.onBackPressed();
+                        })
+                    .setNegativeButton("Don't save", (dialogInterface, i)
+                            -> super.onBackPressed())
+                    .show();
+        else
+            super.onBackPressed();
+    }
 
+    public void onSaveClicked(View view){
         // Get info from UI
         String name = contactName.getText().toString();
         String number = contactNumber.getText().toString();
@@ -50,6 +68,9 @@ public class ContactCard extends AppCompatActivity {
 
         Contact newContact = new Contact(name, number, image);
         setContactAt(position, newContact);
+
+        saved = true;
+        Toast.makeText(this, name + " saved", Toast.LENGTH_SHORT).show();
     }
 
     private Contact getContactAt(int position){
@@ -69,7 +90,7 @@ public class ContactCard extends AppCompatActivity {
         SharedPreferences preferenceNames = getSharedPreferences("contactNames", MODE_PRIVATE);
         SharedPreferences preferenceNumbers = getSharedPreferences("contactNumbers", MODE_PRIVATE);
         SharedPreferences preferenceImages = getSharedPreferences("contactImages", MODE_PRIVATE);
-        // Get shared preferences editor
+        // Get shared preferences editors
         SharedPreferences.Editor namesEditor = preferenceNames.edit();
         SharedPreferences.Editor numbersEditor = preferenceNumbers.edit();
         SharedPreferences.Editor imagesEditor = preferenceImages.edit();
@@ -85,5 +106,5 @@ public class ContactCard extends AppCompatActivity {
         imagesEditor.apply();
     }
 
-    
+
 }

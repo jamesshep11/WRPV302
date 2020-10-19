@@ -9,15 +9,15 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Toast;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public class ContactList extends AppCompatActivity {
-
-    private List<Contact> contacts = new ArrayList<>();
 
     private RecyclerView recyclerView;
     private RecyclerView.Adapter mAdapter;
@@ -39,7 +39,7 @@ public class ContactList extends AppCompatActivity {
         recyclerView.setLayoutManager(layoutManager);
 
         // specify an adapter (see also next example)
-        mAdapter = new MyAdapter(this, contacts);
+        mAdapter = new MyAdapter(this);
         recyclerView.setAdapter(mAdapter);
     }
 
@@ -47,21 +47,7 @@ public class ContactList extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        contacts.clear();
-
-        // Load saved contact information
-
-        // Get info from shared preferences
-        SharedPreferences preferenceNames = getSharedPreferences("contactNames", MODE_PRIVATE);
-        SharedPreferences preferenceNumbers = getSharedPreferences("contactNumbers", MODE_PRIVATE);
-        SharedPreferences preferenceImages = getSharedPreferences("contactImages", MODE_PRIVATE);
-
-        // load info into global contacts list
-        for (int x = 0; x < preferenceNames.getAll().size(); x++){
-            String pos = Integer.toString(x);
-            Contact newContact = new Contact(preferenceNames.getString(pos, ""), preferenceNumbers.getString(pos, ""), preferenceImages.getInt(pos, R.drawable.avatar_01));
-            contacts.add(newContact);
-        }
+        mAdapter.notifyDataSetChanged();
     }
 
     public void onNewContactClicked(View view){
