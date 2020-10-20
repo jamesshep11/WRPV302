@@ -4,12 +4,14 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.net.sip.SipSession;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -59,7 +61,20 @@ class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
             contactActivity.putExtra("position", position);
             context.startActivity(contactActivity);
         });
+        holder.chatButton.setOnClickListener(view -> {
+            Toast.makeText(context, "Loading...", Toast.LENGTH_SHORT).show();
 
+            String phoneNumber = holder.contactNumber.getText().toString();
+            Intent makeCall = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("smsto", phoneNumber, null));
+            context.startActivity(makeCall);
+        });
+        holder.callButton.setOnClickListener(view -> {
+            Toast.makeText(context, "Loading...", Toast.LENGTH_SHORT).show();
+
+            String phoneNumber = holder.contactNumber.getText().toString();
+            Intent makeCall = new Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", phoneNumber, null));
+            context.startActivity(makeCall);
+        });
         holder.deleteButton.setOnClickListener(view -> {
             new AlertDialog.Builder(context)
                 .setTitle("Delete Contact")
