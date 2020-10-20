@@ -19,10 +19,11 @@
             android:layout_height="wrap_content">
 
             <ImageView
-                android:id="@+id/contactImage"
+                android:id="@+id/avatarImage"
                 android:layout_width="0dp"
                 android:layout_height="410dp"
                 android:background="#2196F3"
+                android:onClick="onImageClicked"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
@@ -38,10 +39,10 @@
                 android:hint="Contact Number"
                 android:paddingLeft="10dp"
                 android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                app:layout_constraintEnd_toEndOf="@+id/contactImage"
+                app:layout_constraintEnd_toEndOf="@+id/avatarImage"
                 app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toStartOf="@+id/contactImage"
-                app:layout_constraintTop_toBottomOf="@+id/contactImage" />
+                app:layout_constraintStart_toStartOf="@+id/avatarImage"
+                app:layout_constraintTop_toBottomOf="@+id/avatarImage" />
 
             <EditText
                 android:id="@+id/contactName"
@@ -52,17 +53,17 @@
                 android:hint="Contact Name"
                 android:paddingLeft="10dp"
                 android:textAppearance="@style/TextAppearance.AppCompat.Display1"
-                app:layout_constraintEnd_toEndOf="@+id/contactImage"
+                app:layout_constraintEnd_toEndOf="@+id/avatarImage"
                 app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toStartOf="@+id/contactImage"
+                app:layout_constraintStart_toStartOf="@+id/avatarImage"
                 app:layout_constraintTop_toBottomOf="@+id/contactNumber" />
 
             <ImageView
                 android:id="@+id/imageView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintEnd_toEndOf="@+id/contactImage"
-                app:layout_constraintTop_toTopOf="@+id/contactImage"
+                app:layout_constraintEnd_toEndOf="@+id/avatarImage"
+                app:layout_constraintTop_toTopOf="@+id/avatarImage"
                 app:srcCompat="@android:drawable/ic_menu_edit" />
 
             <ImageView
@@ -71,7 +72,7 @@
                 android:layout_height="wrap_content"
                 app:layout_constraintBottom_toBottomOf="@+id/contactNumber"
                 app:layout_constraintEnd_toEndOf="@+id/contactNumber"
-                app:layout_constraintTop_toBottomOf="@+id/contactImage"
+                app:layout_constraintTop_toBottomOf="@+id/avatarImage"
                 app:srcCompat="@android:drawable/ic_menu_edit" />
 
             <ImageView

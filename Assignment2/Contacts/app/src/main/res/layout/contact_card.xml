@@ -21,7 +21,7 @@
             android:layout_height="wrap_content">
 
             <ImageView
-                android:id="@+id/contactImage"
+                android:id="@+id/avatarImage"
                 android:layout_width="370dp"
                 android:layout_height="370dp"
                 android:background="#2196F3"
@@ -40,9 +40,9 @@
                 android:text="TextView"
                 android:textAppearance="@style/TextAppearance.AppCompat.Large"
                 app:layout_constraintBottom_toTopOf="@+id/contactName"
-                app:layout_constraintEnd_toEndOf="@+id/contactImage"
+                app:layout_constraintEnd_toEndOf="@+id/avatarImage"
                 app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toStartOf="@+id/contactImage" />
+                app:layout_constraintStart_toStartOf="@+id/avatarImage" />
 
             <TextView
                 android:id="@+id/contactName"
@@ -52,10 +52,10 @@
                 android:paddingLeft="10dp"
                 android:text="TextView"
                 android:textAppearance="@style/TextAppearance.AppCompat.Display1"
-                app:layout_constraintBottom_toBottomOf="@+id/contactImage"
-                app:layout_constraintEnd_toEndOf="@+id/contactImage"
+                app:layout_constraintBottom_toBottomOf="@+id/avatarImage"
+                app:layout_constraintEnd_toEndOf="@+id/avatarImage"
                 app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toStartOf="@+id/contactImage" />
+                app:layout_constraintStart_toStartOf="@+id/avatarImage" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/actionButtons"

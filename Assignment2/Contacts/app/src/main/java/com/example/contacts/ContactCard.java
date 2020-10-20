@@ -1,21 +1,19 @@
 package com.example.contacts;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 
-import android.Manifest;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.net.sip.SipSession;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.ArrayList;
 
 public class ContactCard extends AppCompatActivity {
 
@@ -36,7 +34,7 @@ public class ContactCard extends AppCompatActivity {
         // Get reference to UI components
         contactName = findViewById(R.id.contactName);
         contactNumber = findViewById(R.id.contactNumber);
-        contactImage = findViewById(R.id.contactImage);
+        contactImage = findViewById(R.id.avatarImage);
 
         // Read data passed through intent
         Intent thisIntent = getIntent();
@@ -117,5 +115,28 @@ public class ContactCard extends AppCompatActivity {
 
         Intent makeCall = new Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", phoneNumber, null));
         startActivity(makeCall);
+    }
+
+    public void onImageClicked(View view){
+        ArrayList<Integer> avatarImages = new ArrayList<>();
+        avatarImages.add(R.drawable.avatar_01);
+        avatarImages.add(R.drawable.avatar_02);
+        avatarImages.add(R.drawable.avatar_03);
+        avatarImages.add(R.drawable.avatar_04);
+        avatarImages.add(R.drawable.avatar_05);
+        avatarImages.add(R.drawable.avatar_06);
+        avatarImages.add(R.drawable.avatar_07);
+        avatarImages.add(R.drawable.avatar_08);
+        avatarImages.add(R.drawable.avatar_09);
+        avatarImages.add(R.drawable.avatar_pokemon);
+
+        avatarListAdapter avatarImageAdapter = new avatarListAdapter(this, avatarImages);
+        new AlertDialog.Builder(this)
+                .setTitle("Select Avatar")
+                .setAdapter(avatarImageAdapter, (dialog, pos) ->{
+                    contactImage.setImageResource(avatarImages.get(pos));
+                    contactImage.setTag(avatarImages.get(pos));
+                })
+                .show();
     }
 }

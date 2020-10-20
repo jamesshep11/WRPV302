@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
-import android.net.sip.SipSession;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,29 +18,26 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import java.util.List;
-
 import static android.content.Context.MODE_PRIVATE;
 
-class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
+class contactListAdapter extends RecyclerView.Adapter<contactListAdapter.contactViewHolder> {
 
     private Context context;
-    private RecyclerView recyclerView;
 
-    public MyAdapter(Context context) {
+    public contactListAdapter(Context context) {
         this.context = context;
     }
 
     @NonNull
     @Override
-    public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public contactViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater layoutInflater = LayoutInflater.from(context);
         View view = layoutInflater.inflate(R.layout.contact_card, parent, false);
-        return new MyViewHolder(view);
+        return new contactViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull contactViewHolder holder, int position) {
 
         Contact currentContact = getContactAt(position);
 
@@ -127,24 +123,18 @@ class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
         return context.getSharedPreferences("contactNames", MODE_PRIVATE).getAll().size();
     }
 
-    @Override
-    public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
-        super.onAttachedToRecyclerView(recyclerView);
-        this.recyclerView = recyclerView;
-    }
-
-    public static class MyViewHolder extends RecyclerView.ViewHolder {
+    public static class contactViewHolder extends RecyclerView.ViewHolder {
         // each data item is just a string in this case
         TextView contactName, contactNumber;
         ImageView contactImage;
         ConstraintLayout actionButton;
         FloatingActionButton editButton, chatButton, callButton, deleteButton;
 
-        public MyViewHolder(View parentView) {
+        public contactViewHolder(View parentView) {
             super(parentView);
             contactName = parentView.findViewById(R.id.contactNumber);
             contactNumber = parentView.findViewById(R.id.contactName);
-            contactImage = parentView.findViewById(R.id.contactImage);
+            contactImage = parentView.findViewById(R.id.avatarImage);
 
             actionButton = parentView.findViewById(R.id.actionButtons);
 
