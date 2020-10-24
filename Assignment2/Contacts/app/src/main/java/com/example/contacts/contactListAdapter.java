@@ -105,10 +105,16 @@ class contactListAdapter extends RecyclerView.Adapter<contactListAdapter.contact
         SharedPreferences.Editor numbersEditor = preferenceNumbers.edit();
         SharedPreferences.Editor imagesEditor = preferenceImages.edit();
 
-        // Add change to preferences
-        namesEditor.remove(pos);
-        numbersEditor.remove(pos);
-        imagesEditor.remove(pos);
+        for (int i = position; i < preferenceNames.getAll().size() - 1; i++) {
+            // Add change to preferences
+            namesEditor.putString(Integer.toString(i), preferenceNames.getString(Integer.toString(i+1), ""));
+            numbersEditor.putString(Integer.toString(i), preferenceNumbers.getString(Integer.toString(i+1), ""));
+            imagesEditor.putInt(Integer.toString(i), preferenceImages.getInt(Integer.toString(i+1), R.drawable.avatar_01));
+        }
+        namesEditor.remove(Integer.toString(preferenceNames.getAll().size()-1));
+        numbersEditor.remove(Integer.toString(preferenceNumbers.getAll().size()-1));
+        imagesEditor.remove(Integer.toString(preferenceImages.getAll().size()-1));
+
 
         // Save changes to preferences
         namesEditor.apply();
@@ -116,6 +122,7 @@ class contactListAdapter extends RecyclerView.Adapter<contactListAdapter.contact
         imagesEditor.apply();
 
         notifyItemRemoved(position);
+        notifyItemRangeChanged(position, preferenceNames.getAll().size()-position-1);
     }
 
     @Override

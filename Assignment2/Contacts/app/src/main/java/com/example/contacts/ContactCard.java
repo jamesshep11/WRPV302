@@ -8,7 +8,6 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -38,7 +37,7 @@ public class ContactCard extends AppCompatActivity {
 
         // Read data passed through intent
         Intent thisIntent = getIntent();
-        position = thisIntent.getIntExtra("position", getSharedPreferences("contactNames", MODE_PRIVATE).getAll().size());
+        position = thisIntent.getIntExtra("position", findNewContactPosition());
         Contact currentContact = getContactAt(position);
         // Load data to UI
         contactName.setText(currentContact.getName());
@@ -62,6 +61,19 @@ public class ContactCard extends AppCompatActivity {
                     .show();
         else
             super.onBackPressed();
+    }
+
+    // If a contact is removed then the list size and the list indexes won't correlate.
+    // This runs the risk of overriding data if we simply add new items to List.size()
+    // Rather look for a gap in the list indexes first. If no gap is found then we can safely add to the end of the list.
+    private int findNewContactPosition(){
+        // Look for a gap in the list indexes.
+        for (int x = 0; x < getSharedPreferences("contactNames", MODE_PRIVATE).getAll().size(); x++)
+            if (!getSharedPreferences("contactNames", MODE_PRIVATE).contains(Integer.toString(x)))
+                return x;
+
+        // If no contacts were removed (ie. no gap was found) add the new contact to the end of the list
+        return getSharedPreferences("contactNames", MODE_PRIVATE).getAll().size();
     }
 
     public void onSaveClicked(View view){
@@ -118,6 +130,7 @@ public class ContactCard extends AppCompatActivity {
     }
 
     public void onImageClicked(View view){
+        //region Load Contact Images
         ArrayList<Integer> avatarImages = new ArrayList<>();
         avatarImages.add(R.drawable.avatar_01);
         avatarImages.add(R.drawable.avatar_02);
@@ -129,6 +142,7 @@ public class ContactCard extends AppCompatActivity {
         avatarImages.add(R.drawable.avatar_08);
         avatarImages.add(R.drawable.avatar_09);
         avatarImages.add(R.drawable.avatar_pokemon);
+        //endregion
 
         avatarListAdapter avatarImageAdapter = new avatarListAdapter(this, avatarImages);
         new AlertDialog.Builder(this)
