@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">48HourAssignment</string>
+    <array name="entry_types">
+        <item>Vet</item>
+        <item>Medication</item>
+        <item>Appointment</item>
+        <item>Selfie</item>
+    </array>
 </resources>
