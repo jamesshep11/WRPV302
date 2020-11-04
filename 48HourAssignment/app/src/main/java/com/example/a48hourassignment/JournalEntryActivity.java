@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
@@ -66,6 +67,31 @@ public class JournalEntryActivity extends AppCompatActivity {
         txtEntryText.setText(thisEntry.getText());
         imgEntryImage.setImageResource(thisEntry.getImage());
         imgEntryImage.setTag(thisEntry.getImage());
+
+        // link Entry type with entryImage
+        txtEntryType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                int img = R.drawable.vet;
+                switch (position){
+                    case 0: img = R.drawable.vet;
+                        break;
+                    case 1: img = R.drawable.medicine;
+                        break;
+                    case 2: img = R.drawable.appointment;
+                        break;
+                    case 3: img = R.drawable.selfie;
+                        break;
+                }
+                imgEntryImage.setImageResource(img);
+                imgEntryImage.setTag(img);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                parent.setSelection(0);
+            }
+        });
     }
 
     public void changeImage(View view){

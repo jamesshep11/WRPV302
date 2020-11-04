@@ -3,6 +3,7 @@ package com.example.a48hourassignment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -61,6 +63,19 @@ class JournalListAdapter extends RecyclerView.Adapter<JournalListAdapter.entryVi
 
             context.startActivity(entryActivity);
         });
+
+        switch (currentEntry.getType()){
+            case 0: holder.entryCard.setBackgroundResource(R.color.vet);
+                break;
+            case 1: holder.entryCard.setBackgroundResource(R.color.medication);
+                break;
+            case 2: holder.entryCard.setBackgroundResource(R.color.appointment);
+                break;
+            case 3: holder.entryCard.setBackgroundResource(R.color.selfie);
+                break;
+            default: holder.entryCard.setBackgroundResource(R.color.selfie);
+                break;
+        }
     }
 
     @Override
@@ -80,7 +95,7 @@ class JournalListAdapter extends RecyclerView.Adapter<JournalListAdapter.entryVi
             } else {
                 putEntryAt(pos, newEntry);
             }
-            sortList();
+            //sortList();
             notifyDataSetChanged();
             Toast.makeText((Context)publisher, "Saved Successfully", Toast.LENGTH_SHORT).show();
         });
@@ -154,7 +169,7 @@ class JournalListAdapter extends RecyclerView.Adapter<JournalListAdapter.entryVi
             entryText = parentView.findViewById(R.id.txtEntryText);
             entryImage = parentView.findViewById(R.id.imgEntryImage);
 
-            entryCard = (ConstraintLayout)parentView;
+            entryCard = (ConstraintLayout)parentView.findViewById(R.id.EntryCard);
         }
     }
 }

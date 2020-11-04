@@ -4,8 +4,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.View;
 
@@ -52,9 +55,7 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences preferencePetInfo = getSharedPreferences("petInfo", MODE_PRIVATE);
         String petName = preferencePetInfo.getString("petName", null);
 
-        if (petName != null)
-            return;
-
-        onPetInfoClicked(null);
+        if (petName == null)
+            onPetInfoClicked(null);
     }
 }
