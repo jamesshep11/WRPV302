@@ -18,6 +18,7 @@ import com.example.a48hourassignment.PubSubBroker.Broker;
 import com.example.a48hourassignment.PubSubBroker.Subscriber;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Map;
 
 import static android.content.Context.MODE_PRIVATE;
@@ -26,12 +27,10 @@ class JournalListAdapter extends RecyclerView.Adapter<JournalListAdapter.entryVi
 
     private Broker broker;
     private Context context;
-    private ArrayList<Entry> entries = new ArrayList<>();
 
     public JournalListAdapter(Context context) {
         this.context = context;
         implementPubSub();
-        loadEntries();
     }
 
     @NonNull
@@ -45,7 +44,7 @@ class JournalListAdapter extends RecyclerView.Adapter<JournalListAdapter.entryVi
     @Override
     public void onBindViewHolder(@NonNull entryViewHolder holder, int position) {
 
-        Entry currentEntry = entries.get(position);
+        Entry currentEntry = getEntryAt(position);
 
         holder.entryDate.setText(currentEntry.getDate());
         holder.entryText.setText(currentEntry.getText());
@@ -55,10 +54,10 @@ class JournalListAdapter extends RecyclerView.Adapter<JournalListAdapter.entryVi
             Intent entryActivity = new Intent(context, JournalEntryActivity.class);
 
             entryActivity.putExtra("pos", position);
-            entryActivity.putExtra("image", entries.get(position).getImage());
-            entryActivity.putExtra("date", entries.get(position).getDate());
-            entryActivity.putExtra("type", entries.get(position).getType());
-            entryActivity.putExtra("text", entries.get(position).getText());
+            entryActivity.putExtra("image", currentEntry.getImage());
+            entryActivity.putExtra("date", currentEntry.getDate());
+            entryActivity.putExtra("type", currentEntry.getType());
+            entryActivity.putExtra("text", currentEntry.getText());
 
             context.startActivity(entryActivity);
         });
@@ -66,22 +65,7 @@ class JournalListAdapter extends RecyclerView.Adapter<JournalListAdapter.entryVi
 
     @Override
     public int getItemCount() {
-        return entries.size();
-    }
-
-    private void loadEntries(){
-        Toast.makeText(context, "loading...", Toast.LENGTH_SHORT).show();
-
-        SharedPreferences preferenceImages = context.getSharedPreferences("entryImages", MODE_PRIVATE);
-        SharedPreferences preferenceDates = context.getSharedPreferences("entryDates", MODE_PRIVATE);
-        SharedPreferences preferenceTypes = context.getSharedPreferences("entryTypes", MODE_PRIVATE);
-        SharedPreferences preferenceTexts = context.getSharedPreferences("entryTexts", MODE_PRIVATE);
-
-        for (int i = 0; i < preferenceDates.getAll().size(); i++) {
-            String pos = Integer.toString(i);
-            Entry newEntry = new Entry(preferenceImages.getInt(pos, R.drawable.vet), preferenceDates.getString(pos, ""), preferenceTypes.getInt(pos, 0), preferenceTexts.getString(pos, ""));
-            entries.add(newEntry);
-        }
+        return context.getSharedPreferences("entryImages", MODE_PRIVATE).getAll().size();
     }
 
     private void implementPubSub(){
@@ -91,18 +75,72 @@ class JournalListAdapter extends RecyclerView.Adapter<JournalListAdapter.entryVi
             Entry newEntry = (Entry)params.get("entry");
             int pos = (int)params.get("pos");
 
-            if (pos >= entries.size()){
-                entries.add(newEntry);
+            if (pos >= getItemCount()){
+                putEntryAt(getItemCount(), newEntry);
             } else {
-                entries.set(pos, newEntry);
+                putEntryAt(pos, newEntry);
             }
+            sortList();
             notifyDataSetChanged();
             Toast.makeText((Context)publisher, "Saved Successfully", Toast.LENGTH_SHORT).show();
         });
     }
 
-    public Entry getEntryAt(int pos){
-        return entries.get(pos);
+    private Entry getEntryAt(int position){
+        String pos = Integer.toString(position);
+
+        SharedPreferences preferenceImages = context.getSharedPreferences("entryImages", MODE_PRIVATE);
+        SharedPreferences preferenceDates = context.getSharedPreferences("entryDates", MODE_PRIVATE);
+        SharedPreferences preferenceTypes = context.getSharedPreferences("entryTypes", MODE_PRIVATE);
+        SharedPreferences preferenceTexts = context.getSharedPreferences("entryTexts", MODE_PRIVATE);
+
+        int image = preferenceImages.getInt(pos, R.drawable.vet);
+        String date = preferenceDates.getString(pos, "");
+        int type = preferenceTypes.getInt(pos, 0);
+        String text = preferenceTexts.getString(pos, "");
+
+        Entry entry = new Entry(image, date, type, text);
+
+        return entry;
+    }
+
+    private void putEntryAt(int position, Entry entry){
+        // Get shared prefs
+        SharedPreferences preferenceImages = context.getSharedPreferences("entryImages", MODE_PRIVATE);
+        SharedPreferences preferenceDates = context.getSharedPreferences("entryDates", MODE_PRIVATE);
+        SharedPreferences preferenceTypes = context.getSharedPreferences("entryTypes", MODE_PRIVATE);
+        SharedPreferences preferenceTexts = context.getSharedPreferences("entryTexts", MODE_PRIVATE);
+
+        // Get prefs editors
+        SharedPreferences.Editor imageEditor = preferenceImages.edit();
+        SharedPreferences.Editor dateEditor = preferenceDates.edit();
+        SharedPreferences.Editor typeEditor = preferenceTypes.edit();
+        SharedPreferences.Editor textEditor = preferenceTexts.edit();
+
+        // Change prefs
+        String pos = Integer.toString(position);
+        imageEditor.putInt(pos, entry.getImage());
+        dateEditor.putString(pos, entry.getDate());
+        typeEditor.putInt(pos, entry.getType());
+        textEditor.putString(pos, entry.getText());
+
+        // Apply changes
+        imageEditor.apply();
+        dateEditor.apply();
+        typeEditor.apply();
+        textEditor.apply();
+    }
+
+    private void sortList(){
+        ArrayList<Entry> list = new ArrayList<>();
+
+        for (int i = 0; i < getItemCount(); i++)
+            list.add(getEntryAt(i));
+
+        Collections.sort(list, new Entry.sortingComparator());
+
+        for (int i = 0; i < list.size(); i++)
+            putEntryAt(i, list.get(i));
     }
 
     public static class entryViewHolder extends RecyclerView.ViewHolder {

@@ -57,37 +57,4 @@ public class MainActivity extends AppCompatActivity {
 
         onPetInfoClicked(null);
     }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-
-        // Get shared prefs
-        SharedPreferences preferenceImages = getSharedPreferences("entryImages", MODE_PRIVATE);
-        SharedPreferences preferenceDates = getSharedPreferences("entryDates", MODE_PRIVATE);
-        SharedPreferences preferenceTypes = getSharedPreferences("entryTypes", MODE_PRIVATE);
-        SharedPreferences preferenceTexts = getSharedPreferences("entryTexts", MODE_PRIVATE);
-
-        // Get prefs editors
-        SharedPreferences.Editor imageEditor = preferenceImages.edit();
-        SharedPreferences.Editor dateEditor = preferenceDates.edit();
-        SharedPreferences.Editor typeEditor = preferenceTypes.edit();
-        SharedPreferences.Editor textEditor = preferenceTexts.edit();
-
-        // Change prefs
-        for (int i = 0; i < mAdapter.getItemCount(); i++) {
-            String pos = Integer.toString(i);
-            Entry currentEntry = mAdapter.getEntryAt(i);
-            imageEditor.putInt(pos, currentEntry.getImage());
-            dateEditor.putString(pos, currentEntry.getDate());
-            typeEditor.putInt(pos, currentEntry.getType());
-            textEditor.putString(pos, currentEntry.getText());
-        }
-
-        // Apply changes
-        imageEditor.apply();
-        dateEditor.apply();
-        typeEditor.apply();
-        textEditor.apply();
-    }
 }
