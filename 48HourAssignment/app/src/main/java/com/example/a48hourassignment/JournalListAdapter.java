@@ -8,36 +8,30 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.a48hourassignment.PubSubBroker.Broker;
+import com.example.a48hourassignment.PubSubBroker.Subscriber;
+
 import java.util.ArrayList;
+import java.util.Map;
 
 import static android.content.Context.MODE_PRIVATE;
 
 class JournalListAdapter extends RecyclerView.Adapter<JournalListAdapter.entryViewHolder> {
 
+    private Broker broker;
     private Context context;
     private ArrayList<Entry> entries = new ArrayList<>();
 
     public JournalListAdapter(Context context) {
         this.context = context;
+        implementPubSub();
         loadEntries();
-    }
-
-    private void loadEntries(){
-        SharedPreferences preferenceImages = context.getSharedPreferences("entryImages", MODE_PRIVATE);
-        SharedPreferences preferenceDates = context.getSharedPreferences("entryDates", MODE_PRIVATE);
-        SharedPreferences preferenceTypes = context.getSharedPreferences("entryTypes", MODE_PRIVATE);
-        SharedPreferences preferenceTexts = context.getSharedPreferences("entryTexts", MODE_PRIVATE);
-
-        for (int i = 0; i < preferenceDates.getAll().size(); i++) {
-            String pos = Integer.toString(i);
-            Entry newEntry = new Entry(preferenceImages.getInt(pos, R.drawable.vet), preferenceDates.getString(pos, ""), preferenceTypes.getInt(pos, 0), preferenceTexts.getString(pos, ""));
-            entries.add(newEntry);
-        }
     }
 
     @NonNull
@@ -60,6 +54,7 @@ class JournalListAdapter extends RecyclerView.Adapter<JournalListAdapter.entryVi
         holder.entryCard.setOnClickListener(view->{
             Intent entryActivity = new Intent(context, JournalEntryActivity.class);
 
+            entryActivity.putExtra("pos", position);
             entryActivity.putExtra("image", entries.get(position).getImage());
             entryActivity.putExtra("date", entries.get(position).getDate());
             entryActivity.putExtra("type", entries.get(position).getType());
@@ -71,11 +66,46 @@ class JournalListAdapter extends RecyclerView.Adapter<JournalListAdapter.entryVi
 
     @Override
     public int getItemCount() {
-        return entries.size()-1;
+        return entries.size();
+    }
+
+    private void loadEntries(){
+        Toast.makeText(context, "loading...", Toast.LENGTH_SHORT).show();
+
+        SharedPreferences preferenceImages = context.getSharedPreferences("entryImages", MODE_PRIVATE);
+        SharedPreferences preferenceDates = context.getSharedPreferences("entryDates", MODE_PRIVATE);
+        SharedPreferences preferenceTypes = context.getSharedPreferences("entryTypes", MODE_PRIVATE);
+        SharedPreferences preferenceTexts = context.getSharedPreferences("entryTexts", MODE_PRIVATE);
+
+        for (int i = 0; i < preferenceDates.getAll().size(); i++) {
+            String pos = Integer.toString(i);
+            Entry newEntry = new Entry(preferenceImages.getInt(pos, R.drawable.vet), preferenceDates.getString(pos, ""), preferenceTypes.getInt(pos, 0), preferenceTexts.getString(pos, ""));
+            entries.add(newEntry);
+        }
+    }
+
+    private void implementPubSub(){
+        broker = Broker.getInstance();
+        broker.subscribe("SaveEntry", (publisher, topic, params)->{
+            // extract params
+            Entry newEntry = (Entry)params.get("entry");
+            int pos = (int)params.get("pos");
+
+            if (pos >= entries.size()){
+                entries.add(newEntry);
+            } else {
+                entries.set(pos, newEntry);
+            }
+            notifyDataSetChanged();
+            Toast.makeText((Context)publisher, "Saved Successfully", Toast.LENGTH_SHORT).show();
+        });
+    }
+
+    public Entry getEntryAt(int pos){
+        return entries.get(pos);
     }
 
     public static class entryViewHolder extends RecyclerView.ViewHolder {
-        // each data item is just a string in this case
         TextView entryDate, entryText;
         ImageView entryImage;
         ConstraintLayout entryCard;
