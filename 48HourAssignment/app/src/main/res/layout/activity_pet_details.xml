@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".PetDetails">
+    tools:context=".PetInfoActivity">
 
     <ImageView
         android:id="@+id/imgPetImage"
