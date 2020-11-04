@@ -1,10 +1,10 @@
 package com.example.a48hourassignment;
 
 public class Entry {
-    int image;
-    String date, type, text;
+    private int image, type;
+    private String date, text;
 
-    public Entry(int image, String date, String type, String text) {
+    public Entry(int image, String date, int type, String text) {
         this.image = image;
         this.date = date;
         this.type = type;
@@ -28,11 +28,11 @@ public class Entry {
         this.date = date;
     }
 
-    public String getType() {
+    public int getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(int type) {
         this.type = type;
     }
 

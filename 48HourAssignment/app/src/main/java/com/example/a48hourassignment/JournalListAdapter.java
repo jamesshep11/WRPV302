@@ -1,6 +1,7 @@
 package com.example.a48hourassignment;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
@@ -33,7 +35,7 @@ class JournalListAdapter extends RecyclerView.Adapter<JournalListAdapter.entryVi
 
         for (int i = 0; i < preferenceDates.getAll().size(); i++) {
             String pos = Integer.toString(i);
-            Entry newEntry = new Entry(preferenceImages.getInt(pos, R.drawable.vet), preferenceDates.getString(pos, ""), preferenceTypes.getString(pos, ""), preferenceTexts.getString(pos, ""));
+            Entry newEntry = new Entry(preferenceImages.getInt(pos, R.drawable.vet), preferenceDates.getString(pos, ""), preferenceTypes.getInt(pos, 0), preferenceTexts.getString(pos, ""));
             entries.add(newEntry);
         }
     }
@@ -42,7 +44,7 @@ class JournalListAdapter extends RecyclerView.Adapter<JournalListAdapter.entryVi
     @Override
     public entryViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater layoutInflater = LayoutInflater.from(context);
-        View view = layoutInflater.inflate(R.layout.journal_entry, parent, false);
+        View view = layoutInflater.inflate(R.layout.entry, parent, false);
         return new entryViewHolder(view);
     }
 
@@ -54,6 +56,17 @@ class JournalListAdapter extends RecyclerView.Adapter<JournalListAdapter.entryVi
         holder.entryDate.setText(currentEntry.getDate());
         holder.entryText.setText(currentEntry.getText());
         holder.entryImage.setImageResource(currentEntry.getImage());
+
+        holder.entryCard.setOnClickListener(view->{
+            Intent entryActivity = new Intent(context, JournalEntryActivity.class);
+
+            entryActivity.putExtra("image", entries.get(position).getImage());
+            entryActivity.putExtra("date", entries.get(position).getDate());
+            entryActivity.putExtra("type", entries.get(position).getType());
+            entryActivity.putExtra("text", entries.get(position).getText());
+
+            context.startActivity(entryActivity);
+        });
     }
 
     @Override
@@ -65,12 +78,15 @@ class JournalListAdapter extends RecyclerView.Adapter<JournalListAdapter.entryVi
         // each data item is just a string in this case
         TextView entryDate, entryText;
         ImageView entryImage;
+        ConstraintLayout entryCard;
 
         public entryViewHolder(View parentView) {
             super(parentView);
             entryDate = parentView.findViewById(R.id.txtDate);
             entryText = parentView.findViewById(R.id.txtEntryText);
             entryImage = parentView.findViewById(R.id.imgEntryImage);
+
+            entryCard = (ConstraintLayout)parentView;
         }
     }
 }

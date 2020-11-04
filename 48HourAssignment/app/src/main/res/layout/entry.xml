@@ -15,6 +15,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/EntryCard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
@@ -28,10 +29,10 @@
                 android:text="TextView"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/imageView" />
+                app:layout_constraintTop_toBottomOf="@+id/imgEntryImage" />
 
             <ImageView
-                android:id="@+id/imageView"
+                android:id="@+id/imgEntryImage"
                 android:layout_width="0dp"
                 android:layout_height="400dp"
                 android:layout_marginStart="24dp"
