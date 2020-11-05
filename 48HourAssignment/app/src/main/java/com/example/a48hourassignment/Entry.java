@@ -5,14 +5,14 @@ import java.util.Comparator;
 public class Entry {
     private int type;
     private String date, text, image;
-    private Boolean photo;
+    private Boolean hasPhoto;
 
     public Entry(String image, String date, int type, String text) {
         this.image = image;
         this.date = date;
         this.type = type;
         this.text = text;
-        this.photo = false;
+        this.hasPhoto = false;
     }
 
     //region Getters & Setters
@@ -48,12 +48,12 @@ public class Entry {
         this.text = text;
     }
 
-    public Boolean getPhoto() {
-        return photo;
+    public Boolean hasPhoto() {
+        return hasPhoto;
     }
 
-    public void setPhoto(Boolean photo) {
-        this.photo = photo;
+    public void setHasPhoto(Boolean hasPhoto) {
+        this.hasPhoto = hasPhoto;
     }
 
     //endregion

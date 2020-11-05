@@ -34,10 +34,60 @@ public class JournalEntryActivity extends AppCompatActivity {
     ImageView imgEntryImage;
     EditText txtEntryDate, txtEntryText;
     Spinner txtEntryType;
+    ConstraintLayout journalEntryLayout;
 
     Entry thisEntry;
     int pos;
     String newCameraImagePath;
+
+    // Link Entry type with entryImage and entryColor
+    private AdapterView.OnItemSelectedListener colorImageListener = new AdapterView.OnItemSelectedListener() {
+        @Override
+        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            String img = Integer.toString(R.drawable.vet);
+            switch (position){
+                case 0: img = Integer.toString(R.drawable.vet);
+                    journalEntryLayout.setBackgroundResource(R.color.vet);
+                    break;
+                case 1: img = Integer.toString(R.drawable.medicine);
+                    journalEntryLayout.setBackgroundResource(R.color.medication);
+                    break;
+                case 2: img = Integer.toString(R.drawable.appointment);
+                    journalEntryLayout.setBackgroundResource(R.color.appointment);
+                    break;
+                case 3: img = Integer.toString(R.drawable.selfie);
+                    journalEntryLayout.setBackgroundResource(R.color.selfie);
+                    break;
+            }
+            loadImgToView(img);
+        }
+
+        @Override
+        public void onNothingSelected(AdapterView<?> parent) {
+            parent.setSelection(0);
+        }
+    };
+    // Link Entry type with just entryColor
+    private AdapterView.OnItemSelectedListener colorListener = new AdapterView.OnItemSelectedListener() {
+        @Override
+        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            switch (position){
+                case 0: journalEntryLayout.setBackgroundResource(R.color.vet);
+                    break;
+                case 1: journalEntryLayout.setBackgroundResource(R.color.medication);
+                    break;
+                case 2: journalEntryLayout.setBackgroundResource(R.color.appointment);
+                    break;
+                case 3: journalEntryLayout.setBackgroundResource(R.color.selfie);
+                    break;
+            }
+        }
+
+        @Override
+        public void onNothingSelected(AdapterView<?> parent) {
+            parent.setSelection(0);
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +101,7 @@ public class JournalEntryActivity extends AppCompatActivity {
         txtEntryDate = findViewById(R.id.txtDate);
         txtEntryType = findViewById(R.id.txtEntryType);
         txtEntryText = findViewById(R.id.txtEntryText);
-        ConstraintLayout journalEntryLayout = findViewById(R.id.journalEntryLayout);
+        journalEntryLayout = findViewById(R.id.journalEntryLayout);
 
         // Extract data from intent
         Intent thisIntent = getIntent();
@@ -62,7 +112,9 @@ public class JournalEntryActivity extends AppCompatActivity {
         date = (date != null) ? date : new SimpleDateFormat("yyyy/MM/dd").format(new Date());                 // default date is today
         int type = thisIntent.getIntExtra("type", 0);
         String text = thisIntent.getStringExtra("text");
+        Boolean hasPhoto = thisIntent.getBooleanExtra("hasPhoto", false);
         thisEntry = new Entry(img, date, type, text);
+        thisEntry.setHasPhoto(hasPhoto);
 
         // Load data to UI components
         txtEntryDate.setText(thisEntry.getDate());
@@ -70,33 +122,11 @@ public class JournalEntryActivity extends AppCompatActivity {
         txtEntryText.setText(thisEntry.getText());
         loadImgToView(thisEntry.getImage());
 
-        // Link Entry type with entryImage and entryColor
-        txtEntryType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                String img = Integer.toString(R.drawable.vet);
-                switch (position){
-                    case 0: img = Integer.toString(R.drawable.vet);
-                            journalEntryLayout.setBackgroundResource(R.color.vet);
-                        break;
-                    case 1: img = Integer.toString(R.drawable.medicine);
-                            journalEntryLayout.setBackgroundResource(R.color.medication);
-                        break;
-                    case 2: img = Integer.toString(R.drawable.appointment);
-                            journalEntryLayout.setBackgroundResource(R.color.appointment);
-                        break;
-                    case 3: img = Integer.toString(R.drawable.selfie);
-                            journalEntryLayout.setBackgroundResource(R.color.selfie);
-                        break;
-                }
-                loadImgToView(img);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                parent.setSelection(0);
-            }
-        });
+        // Set entryType listener
+        if (thisEntry.hasPhoto())
+            txtEntryType.setOnItemSelectedListener(colorListener);
+        else
+            txtEntryType.setOnItemSelectedListener(colorImageListener);
     }
 
     private Boolean validDate(String date){
@@ -196,10 +226,7 @@ public class JournalEntryActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            Bundle extras = data.getExtras();
-            Bitmap imageBitmap = (Bitmap) extras.get("data");
-            imgEntryImage.setImageBitmap(imageBitmap);
-            thisEntry.setImage(newCameraImagePath);
+            loadImgToView(newCameraImagePath);
         }
     }
     //endregion

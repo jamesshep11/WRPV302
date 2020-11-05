@@ -53,6 +53,10 @@ class JournalListAdapter extends RecyclerView.Adapter<JournalListAdapter.entryVi
         holder.entryDate.setText(currentEntry.getDate());
         holder.entryText.setText(currentEntry.getText());
         loadImgToView(holder.entryImage, currentEntry.getImage());
+        if (currentEntry.hasPhoto())
+            holder.entryImage.setMaxHeight(400);
+        else
+            holder.entryImage.setMaxHeight(200);
 
         holder.entryCard.setOnClickListener(view->{
             Intent entryActivity = new Intent(context, JournalEntryActivity.class);
@@ -62,6 +66,7 @@ class JournalListAdapter extends RecyclerView.Adapter<JournalListAdapter.entryVi
             entryActivity.putExtra("date", currentEntry.getDate());
             entryActivity.putExtra("type", currentEntry.getType());
             entryActivity.putExtra("text", currentEntry.getText());
+            entryActivity.putExtra("hasPhoto", currentEntry.hasPhoto());
 
             context.startActivity(entryActivity);
         });
@@ -109,13 +114,16 @@ class JournalListAdapter extends RecyclerView.Adapter<JournalListAdapter.entryVi
         SharedPreferences preferenceDates = context.getSharedPreferences("entryDates", MODE_PRIVATE);
         SharedPreferences preferenceTypes = context.getSharedPreferences("entryTypes", MODE_PRIVATE);
         SharedPreferences preferenceTexts = context.getSharedPreferences("entryTexts", MODE_PRIVATE);
+        SharedPreferences preferenceHasPhoto = context.getSharedPreferences("entryHasPhoto", MODE_PRIVATE);
 
         String image = preferenceImages.getString(pos, Integer.toString(R.drawable.vet));
         String date = preferenceDates.getString(pos, "");
         int type = preferenceTypes.getInt(pos, 0);
         String text = preferenceTexts.getString(pos, "");
+        Boolean hasPhoto = preferenceHasPhoto.getBoolean(pos, false);
 
         Entry entry = new Entry(image, date, type, text);
+        entry.setHasPhoto(hasPhoto);
 
         return entry;
     }
@@ -126,12 +134,14 @@ class JournalListAdapter extends RecyclerView.Adapter<JournalListAdapter.entryVi
         SharedPreferences preferenceDates = context.getSharedPreferences("entryDates", MODE_PRIVATE);
         SharedPreferences preferenceTypes = context.getSharedPreferences("entryTypes", MODE_PRIVATE);
         SharedPreferences preferenceTexts = context.getSharedPreferences("entryTexts", MODE_PRIVATE);
+        SharedPreferences preferenceHasPhoto = context.getSharedPreferences("entryHasPhoto", MODE_PRIVATE);
 
         // Get prefs editors
         SharedPreferences.Editor imageEditor = preferenceImages.edit();
         SharedPreferences.Editor dateEditor = preferenceDates.edit();
         SharedPreferences.Editor typeEditor = preferenceTypes.edit();
         SharedPreferences.Editor textEditor = preferenceTexts.edit();
+        SharedPreferences.Editor hasPhotoEditor = preferenceHasPhoto.edit();
 
         // Change prefs
         String pos = Integer.toString(position);
@@ -139,12 +149,14 @@ class JournalListAdapter extends RecyclerView.Adapter<JournalListAdapter.entryVi
         dateEditor.putString(pos, entry.getDate());
         typeEditor.putInt(pos, entry.getType());
         textEditor.putString(pos, entry.getText());
+        hasPhotoEditor.putBoolean(pos, entry.hasPhoto());
 
         // Apply changes
         imageEditor.apply();
         dateEditor.apply();
         typeEditor.apply();
         textEditor.apply();
+        hasPhotoEditor.apply();
     }
 
     private void sortList(){
