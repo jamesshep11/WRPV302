@@ -3,22 +3,24 @@ package com.example.a48hourassignment;
 import java.util.Comparator;
 
 public class Entry {
-    private int image, type;
-    private String date, text;
+    private int type;
+    private String date, text, image;
+    private Boolean photo;
 
-    public Entry(int image, String date, int type, String text) {
+    public Entry(String image, String date, int type, String text) {
         this.image = image;
         this.date = date;
         this.type = type;
         this.text = text;
+        this.photo = false;
     }
 
     //region Getters & Setters
-    public int getImage() {
+    public String getImage() {
         return image;
     }
 
-    public void setImage(int image) {
+    public void setImage(String image) {
         this.image = image;
     }
 
@@ -45,6 +47,15 @@ public class Entry {
     public void setText(String text) {
         this.text = text;
     }
+
+    public Boolean getPhoto() {
+        return photo;
+    }
+
+    public void setPhoto(Boolean photo) {
+        this.photo = photo;
+    }
+
     //endregion
 
     static class sortingComparator implements Comparator<Entry>

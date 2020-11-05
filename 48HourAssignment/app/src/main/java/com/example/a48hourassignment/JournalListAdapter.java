@@ -3,6 +3,8 @@ package com.example.a48hourassignment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -50,7 +52,7 @@ class JournalListAdapter extends RecyclerView.Adapter<JournalListAdapter.entryVi
 
         holder.entryDate.setText(currentEntry.getDate());
         holder.entryText.setText(currentEntry.getText());
-        holder.entryImage.setImageResource(currentEntry.getImage());
+        loadImgToView(holder.entryImage, currentEntry.getImage());
 
         holder.entryCard.setOnClickListener(view->{
             Intent entryActivity = new Intent(context, JournalEntryActivity.class);
@@ -73,8 +75,6 @@ class JournalListAdapter extends RecyclerView.Adapter<JournalListAdapter.entryVi
             case 2: holder.entryCard.setBackgroundResource(R.color.appointment);
                 break;
             case 3: holder.entryCard.setBackgroundResource(R.color.selfie);
-                break;
-            default: holder.entryCard.setBackgroundResource(R.color.selfie);
                 break;
         }
     }
@@ -110,7 +110,7 @@ class JournalListAdapter extends RecyclerView.Adapter<JournalListAdapter.entryVi
         SharedPreferences preferenceTypes = context.getSharedPreferences("entryTypes", MODE_PRIVATE);
         SharedPreferences preferenceTexts = context.getSharedPreferences("entryTexts", MODE_PRIVATE);
 
-        int image = preferenceImages.getInt(pos, R.drawable.vet);
+        String image = preferenceImages.getString(pos, Integer.toString(R.drawable.vet));
         String date = preferenceDates.getString(pos, "");
         int type = preferenceTypes.getInt(pos, 0);
         String text = preferenceTexts.getString(pos, "");
@@ -135,7 +135,7 @@ class JournalListAdapter extends RecyclerView.Adapter<JournalListAdapter.entryVi
 
         // Change prefs
         String pos = Integer.toString(position);
-        imageEditor.putInt(pos, entry.getImage());
+        imageEditor.putString(pos, entry.getImage());
         dateEditor.putString(pos, entry.getDate());
         typeEditor.putInt(pos, entry.getType());
         textEditor.putString(pos, entry.getText());
@@ -157,6 +157,18 @@ class JournalListAdapter extends RecyclerView.Adapter<JournalListAdapter.entryVi
 
         for (int i = 0; i < list.size(); i++)
             putEntryAt(i, list.get(i));
+    }
+
+    private void loadImgToView(ImageView imageView, String imagePath){
+        try{
+            int imageResource = Integer.parseInt(imagePath);
+            imageView.setImageResource(imageResource);
+            imageView.setTag(imagePath);
+        }catch(Exception ex) {
+            Bitmap imageBitmap = BitmapFactory.decodeFile(imagePath);
+            imageView.setImageBitmap(imageBitmap);
+            imageView.setTag(imagePath);
+        }
     }
 
     public static class entryViewHolder extends RecyclerView.ViewHolder {
