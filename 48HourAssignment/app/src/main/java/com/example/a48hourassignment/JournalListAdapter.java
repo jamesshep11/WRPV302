@@ -98,7 +98,7 @@ class JournalListAdapter extends RecyclerView.Adapter<JournalListAdapter.entryVi
             notifyDataSetChanged();
             notifyItemRangeChanged(0, getItemCount());
 
-            Toast.makeText((Context)publisher, "Saved Successfully", Toast.LENGTH_SHORT).show();
+            Toast.makeText((Context)publisher, R.string.save_successful, Toast.LENGTH_SHORT).show();
         });
     }
 

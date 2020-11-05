@@ -69,8 +69,8 @@ public class PetInfoActivity extends AppCompatActivity {
                 photoFile = createImageFile();
             } catch (IOException ex) {
                 new AlertDialog.Builder(this)
-                        .setTitle("Error")
-                        .setMessage("Could not create image file")
+                        .setTitle(R.string.error)
+                        .setMessage(R.string.error_creating_image_file)
                         .show();
             }
             // Continue only if the File was successfully created
@@ -118,10 +118,10 @@ public class PetInfoActivity extends AppCompatActivity {
 
         if (!validDate(petDateOfBirth)) {
             new AlertDialog.Builder(this)
-                    .setTitle("Error")
-                    .setMessage("The date you entered is not valid.")
+                    .setTitle(R.string.error)
+                    .setMessage(R.string.invalid_data)
                     .setOnDismissListener(dialog -> {
-                        Toast.makeText(this, "Could Not Save", Toast.LENGTH_LONG).show();
+                        Toast.makeText(this, R.string.save_failed, Toast.LENGTH_LONG).show();
                     })
                     .show();
             return;
@@ -139,7 +139,7 @@ public class PetInfoActivity extends AppCompatActivity {
         // Apply changes
         petEditor.apply();
 
-        Toast.makeText(this, "Saved Successfully", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, R.string.save_successful, Toast.LENGTH_SHORT).show();
     }
 
     private Boolean validDate(String date){

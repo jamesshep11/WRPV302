@@ -109,10 +109,21 @@ public class JournalEntryActivity extends AppCompatActivity {
     }
 
     private Boolean validDate(String date){
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+        Date tempDate;
+
+        try {
+            tempDate = dateFormat.parse(date);
+        } catch (Exception ex) {
+            return false;
+        }
+
+        if (!dateFormat.format(tempDate).equals(date)) {
+            return false;
+        }
+
         // Get entered date components
         String[] dateBreakdown = date.split("/");
-        if (dateBreakdown.length != 3)                                              // More/less than 2 '/' entered
-            return false;
         String year = dateBreakdown[0],
                 month = dateBreakdown[1],
                 day = dateBreakdown[2];
@@ -123,16 +134,9 @@ public class JournalEntryActivity extends AppCompatActivity {
                 thisMonth = todayBreakdown[1],
                 thisDay = todayBreakdown[2];
 
-        if (year.length() != 4 || month.length() != 2 || day.length() != 2)         // Not in format yyyy/mm/dd
-            return false;
-        try{                                                                        // Values are not all numbers
-            Integer.parseInt(year);
-            Integer.parseInt(month);
-            Integer.parseInt(day);
-        } catch(Exception ex){
-            return false;
-        }                                                                           // Date given is in the future
-        if (year.compareTo(thisYear) > 0 || (year.equals(thisYear) && (month.compareTo(thisMonth) > 0 || (month.equals(thisMonth) && day.compareTo(thisDay) > 0))))
+        if (year.compareTo(thisYear) > 0 ||                                         // Year is in the future
+                (year.equals(thisYear) && (month.compareTo(thisMonth) > 0 ||        // Month is in the future
+                        (month.equals(thisMonth) && day.compareTo(thisDay) > 0))))  // Day is in the future
             return false;
 
         return true;
@@ -155,8 +159,8 @@ public class JournalEntryActivity extends AppCompatActivity {
                 photoFile = createImageFile();
             } catch (IOException ex) {
                 new AlertDialog.Builder(this)
-                        .setTitle("Error")
-                        .setMessage("Could not create image file")
+                        .setTitle(R.string.error)
+                        .setMessage(R.string.error_creating_image_file)
                         .show();
             }
             // Continue only if the File was successfully created
@@ -206,10 +210,10 @@ public class JournalEntryActivity extends AppCompatActivity {
         // Validate the date
         if (!validDate(thisEntry.getDate())) {
             new AlertDialog.Builder(this)
-                    .setTitle("Error")
-                    .setMessage("The date you entered is not valid.")
+                    .setTitle(R.string.error)
+                    .setMessage(R.string.invalid_data)
                     .setOnDismissListener(dialog -> {
-                        Toast.makeText(this, "Could Not Save", Toast.LENGTH_LONG).show();
+                        Toast.makeText(this, R.string.save_failed, Toast.LENGTH_LONG).show();
                     })
                     .show();
             return;
