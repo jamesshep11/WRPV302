@@ -45,6 +45,7 @@ public class PetInfoActivity extends AppCompatActivity {
         String petName = preferencePetInfo.getString("petName", "");
         String petDateOfBirth = preferencePetInfo.getString("petDateOfBirth", "");
         String petImage = preferencePetInfo.getString("petImage", Integer.toString(R.drawable.ic_launcher_foreground));
+        petPhotoPath = petImage;
 
         // Load data to UI components
         txtPetName.setText(petName);

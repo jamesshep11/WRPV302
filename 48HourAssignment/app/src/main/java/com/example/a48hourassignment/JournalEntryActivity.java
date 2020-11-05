@@ -227,6 +227,7 @@ public class JournalEntryActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             loadImgToView(newCameraImagePath);
+            thisEntry.setHasPhoto(true);
         }
     }
     //endregion
