@@ -56,7 +56,7 @@ public class JournalEntryActivity extends AppCompatActivity {
         pos = thisIntent.getIntExtra("pos", -1);
         int img = thisIntent.getIntExtra("image", R.drawable.vet);
         String date = thisIntent.getStringExtra("date");
-        date = (date != null) ? date : Calendar.getInstance().getTime().toString(); // default date is today
+        date = (date != null) ? date : new SimpleDateFormat("yyyy/MM/dd").format(new Date());                 // default date is today
         int type = thisIntent.getIntExtra("type", 0);
         String text = thisIntent.getStringExtra("text");
         thisEntry = new Entry(img, date, type, text);

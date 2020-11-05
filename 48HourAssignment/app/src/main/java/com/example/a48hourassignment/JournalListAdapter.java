@@ -90,13 +90,12 @@ class JournalListAdapter extends RecyclerView.Adapter<JournalListAdapter.entryVi
             Entry newEntry = (Entry)params.get("entry");
             int pos = (int)params.get("pos");
 
-            if (pos >= getItemCount()){
-                putEntryAt(getItemCount(), newEntry);
-            } else {
-                putEntryAt(pos, newEntry);
-            }
-            //sortList();
+            putEntryAt(getItemCount(), newEntry);
+            sortList();
+            
             notifyDataSetChanged();
+            notifyItemRangeChanged(0, getItemCount());
+
             Toast.makeText((Context)publisher, "Saved Successfully", Toast.LENGTH_SHORT).show();
         });
     }
