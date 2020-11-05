@@ -13,16 +13,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.a48hourassignment.PubSubBroker.Broker;
-import com.example.a48hourassignment.PubSubBroker.Subscriber;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Map;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -31,8 +28,18 @@ class JournalListAdapter extends RecyclerView.Adapter<JournalListAdapter.entryVi
     private Broker broker;
     private Context context;
 
-    public JournalListAdapter(Context context) {
+    static private JournalListAdapter instance = null;      // singleton instance
+
+    static public JournalListAdapter getInstance(Context context){
+        if(instance == null)
+            instance = new JournalListAdapter(context);
+
+        return instance;
+    }
+
+    private JournalListAdapter(Context context) {
         this.context = context;
+        implementPubSub();
     }
 
     @NonNull
@@ -161,11 +168,14 @@ class JournalListAdapter extends RecyclerView.Adapter<JournalListAdapter.entryVi
     private void sortList(){
         ArrayList<Entry> list = new ArrayList<>();
 
+        // Load entries from shared prefs to list
         for (int i = 0; i < getItemCount(); i++)
             list.add(getEntryAt(i));
 
+        // Sort List
         Collections.sort(list, new sortingComparator());
 
+        // Load sorted entries back to shared prefs
         for (int i = 0; i < list.size(); i++)
             putEntryAt(i, list.get(i));
     }
