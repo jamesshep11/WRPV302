@@ -57,11 +57,4 @@ public class Entry {
     }
 
     //endregion
-
-    static class sortingComparator implements Comparator<Entry>
-    {
-        public int compare(Entry a, Entry b) {
-            return b.getDate().compareTo(a.getDate());
-        }
-    }
 }

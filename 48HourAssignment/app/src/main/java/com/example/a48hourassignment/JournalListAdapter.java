@@ -33,7 +33,6 @@ class JournalListAdapter extends RecyclerView.Adapter<JournalListAdapter.entryVi
 
     public JournalListAdapter(Context context) {
         this.context = context;
-        implementPubSub();
     }
 
     @NonNull
@@ -89,7 +88,7 @@ class JournalListAdapter extends RecyclerView.Adapter<JournalListAdapter.entryVi
         return context.getSharedPreferences("entryImages", MODE_PRIVATE).getAll().size();
     }
 
-    private void implementPubSub(){
+    public void implementPubSub(){
         broker = Broker.getInstance();
         broker.subscribe("SaveEntry", (publisher, topic, params)->{
             // extract params
@@ -98,10 +97,10 @@ class JournalListAdapter extends RecyclerView.Adapter<JournalListAdapter.entryVi
 
             putEntryAt(pos, newEntry);
 
-            sortList();
-
             notifyDataSetChanged();
             notifyItemRangeChanged(0, getItemCount());
+
+            sortList();
 
             Toast.makeText((Context)publisher, R.string.save_successful, Toast.LENGTH_SHORT).show();
         });
@@ -165,7 +164,7 @@ class JournalListAdapter extends RecyclerView.Adapter<JournalListAdapter.entryVi
         for (int i = 0; i < getItemCount(); i++)
             list.add(getEntryAt(i));
 
-        Collections.sort(list, new Entry.sortingComparator());
+        Collections.sort(list, new sortingComparator());
 
         for (int i = 0; i < list.size(); i++)
             putEntryAt(i, list.get(i));

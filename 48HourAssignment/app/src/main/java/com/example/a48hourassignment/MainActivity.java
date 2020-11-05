@@ -12,6 +12,8 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.View;
 
+import com.example.a48hourassignment.PubSubBroker.Broker;
+
 public class MainActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
@@ -22,8 +24,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        firstTime();
 
         recyclerView = findViewById(R.id.recyclerView);
 
@@ -38,6 +38,8 @@ public class MainActivity extends AppCompatActivity {
         // specify an adapter
         mAdapter = new JournalListAdapter(this);
         recyclerView.setAdapter(mAdapter);
+
+        firstTime();
     }
 
     public void onAddEntryClicked(View view){
@@ -54,7 +56,10 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences preferencePetInfo = getSharedPreferences("petInfo", MODE_PRIVATE);
         String petName = preferencePetInfo.getString("petName", null);
 
-        if (petName == null)
+        if (petName == null) {
             onPetInfoClicked(null);
+            mAdapter.implementPubSub();
+        }
+
     }
 }
