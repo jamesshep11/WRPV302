@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -53,10 +52,11 @@ class JournalListAdapter extends RecyclerView.Adapter<JournalListAdapter.entryVi
         holder.entryDate.setText(currentEntry.getDate());
         holder.entryText.setText(currentEntry.getText());
         loadImgToView(holder.entryImage, currentEntry.getImage());
-        if (currentEntry.hasPhoto())
-            holder.entryImage.setMaxHeight(400);
-        else
-            holder.entryImage.setMaxHeight(200);
+        if (!currentEntry.hasPhoto()) {
+            ViewGroup.LayoutParams imageViewParams = holder.entryImage.getLayoutParams();
+            imageViewParams.height *= 0.5;
+            holder.entryImage.setLayoutParams(imageViewParams);
+        }
 
         holder.entryCard.setOnClickListener(view->{
             Intent entryActivity = new Intent(context, JournalEntryActivity.class);
