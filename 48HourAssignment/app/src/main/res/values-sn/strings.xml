@@ -10,4 +10,8 @@
     <string name="pet_name">Pet Zita</string>
     <string name="save_failed">Kutadza Kuchengeta</string>
     <string name="save_successful">Inoponeswa Zvinobudirira</string>
+    <string name="appointment">Kugadzwa</string>
+    <string name="medication">Mishonga</string>
+    <string name="selfie">Selfie</string>
+    <string name="vet">Chiremba wemhuka</string>
 </resources>
