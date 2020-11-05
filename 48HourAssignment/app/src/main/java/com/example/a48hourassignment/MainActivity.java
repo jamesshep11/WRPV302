@@ -42,7 +42,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void onAddEntryClicked(View view){
         Intent entryActivity = new Intent(this, JournalEntryActivity.class);
-        entryActivity.putExtra("pos", mAdapter.getItemCount());
         startActivity(entryActivity);
     }
 

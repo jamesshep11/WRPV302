@@ -64,6 +64,7 @@ class JournalListAdapter extends RecyclerView.Adapter<JournalListAdapter.entryVi
             context.startActivity(entryActivity);
         });
 
+        // Link entryType with entry colour
         switch (currentEntry.getType()){
             case 0: holder.entryCard.setBackgroundResource(R.color.vet);
                 break;
@@ -90,9 +91,10 @@ class JournalListAdapter extends RecyclerView.Adapter<JournalListAdapter.entryVi
             Entry newEntry = (Entry)params.get("entry");
             int pos = (int)params.get("pos");
 
-            putEntryAt(getItemCount(), newEntry);
+            putEntryAt(pos, newEntry);
+
             sortList();
-            
+
             notifyDataSetChanged();
             notifyItemRangeChanged(0, getItemCount());
 

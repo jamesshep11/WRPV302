@@ -2,9 +2,9 @@ package com.example.a48hourassignment;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.FileProvider;
 
-import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -16,13 +16,13 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.example.a48hourassignment.PubSubBroker.Broker;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -50,10 +50,11 @@ public class JournalEntryActivity extends AppCompatActivity {
         txtEntryDate = findViewById(R.id.txtDate);
         txtEntryType = findViewById(R.id.txtEntryType);
         txtEntryText = findViewById(R.id.txtEntryText);
+        ConstraintLayout journalEntryLayout = findViewById(R.id.journalEntryLayout);
 
         // Extract data from intent
         Intent thisIntent = getIntent();
-        pos = thisIntent.getIntExtra("pos", -1);
+        pos = thisIntent.getIntExtra("pos", getSharedPreferences("entryImages", MODE_PRIVATE).getAll().size());
         int img = thisIntent.getIntExtra("image", R.drawable.vet);
         String date = thisIntent.getStringExtra("date");
         date = (date != null) ? date : new SimpleDateFormat("yyyy/MM/dd").format(new Date());                 // default date is today
@@ -68,7 +69,7 @@ public class JournalEntryActivity extends AppCompatActivity {
         imgEntryImage.setImageResource(thisEntry.getImage());
         imgEntryImage.setTag(thisEntry.getImage());
 
-        // link Entry type with entryImage
+        // Link Entry type with entryImage
         txtEntryType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -92,6 +93,49 @@ public class JournalEntryActivity extends AppCompatActivity {
                 parent.setSelection(0);
             }
         });
+        // Link entryType with entry colour
+        switch (thisEntry.getType()){
+            case 0: journalEntryLayout.setBackgroundResource(R.color.vet);
+                break;
+            case 1: journalEntryLayout.setBackgroundResource(R.color.medication);
+                break;
+            case 2: journalEntryLayout.setBackgroundResource(R.color.appointment);
+                break;
+            case 3: journalEntryLayout.setBackgroundResource(R.color.selfie);
+                break;
+            default: journalEntryLayout.setBackgroundResource(R.color.selfie);
+                break;
+        }
+    }
+
+    private Boolean validDate(String date){
+        // Get entered date components
+        String[] dateBreakdown = date.split("/");
+        if (dateBreakdown.length != 3)                                              // More/less than 2 '/' entered
+            return false;
+        String year = dateBreakdown[0],
+                month = dateBreakdown[1],
+                day = dateBreakdown[2];
+
+        // Get today's date components
+        String[] todayBreakdown = (new SimpleDateFormat("yyyy/MM/dd").format(new Date())).split("/");
+        String thisYear = todayBreakdown[0],
+                thisMonth = todayBreakdown[1],
+                thisDay = todayBreakdown[2];
+
+        if (year.length() != 4 || month.length() != 2 || day.length() != 2)         // Not in format yyyy/mm/dd
+            return false;
+        try{                                                                        // Values are not all numbers
+            Integer.parseInt(year);
+            Integer.parseInt(month);
+            Integer.parseInt(day);
+        } catch(Exception ex){
+            return false;
+        }                                                                           // Date given is in the future
+        if (year.compareTo(thisYear) > 0 || (year.equals(thisYear) && (month.compareTo(thisMonth) > 0 || (month.equals(thisMonth) && day.compareTo(thisDay) > 0))))
+            return false;
+
+        return true;
     }
 
     public void changeImage(View view){
@@ -153,11 +197,25 @@ public class JournalEntryActivity extends AppCompatActivity {
     //endregion
 
     public void onSaveClicked(View view){
+        // Get data  from UI
         thisEntry.setImage(Integer.parseInt(imgEntryImage.getTag().toString()));
         thisEntry.setDate(txtEntryDate.getText().toString());
         thisEntry.setType(txtEntryType.getSelectedItemPosition());
         thisEntry.setText(txtEntryText.getText().toString());
 
+        // Validate the date
+        if (!validDate(thisEntry.getDate())) {
+            new AlertDialog.Builder(this)
+                    .setTitle("Error")
+                    .setMessage("The date you entered is not valid.")
+                    .setOnDismissListener(dialog -> {
+                        Toast.makeText(this, "Could Not Save", Toast.LENGTH_LONG).show();
+                    })
+                    .show();
+            return;
+        }
+
+        // Alter ListAdapter to add/update the Entry
         HashMap<String, Object> params = new HashMap<>();
         params.put("entry", thisEntry);
         params.put("pos", pos);
