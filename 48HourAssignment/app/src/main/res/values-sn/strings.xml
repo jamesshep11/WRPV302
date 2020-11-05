@@ -14,4 +14,8 @@
     <string name="medication">Mishonga</string>
     <string name="selfie">Selfie</string>
     <string name="vet">Chiremba wemhuka</string>
+    <string name="no">Aihwa</string>
+    <string name="save">Sevha</string>
+    <string name="save_request">Ungade kusevha usati waenda?</string>
+    <string name="yes">Hongu</string>
 </resources>

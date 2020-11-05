@@ -25,9 +25,11 @@ import java.util.Date;
 
 public class PetInfoActivity extends AppCompatActivity {
 
+    // Reference to UI components
     ImageView imgPetImage;
     EditText txtPetName, txtPetDateOfBirth;
 
+    // The absolutePath to the image taken with the camera
     String petPhotoPath;
 
     @Override
@@ -53,6 +55,7 @@ public class PetInfoActivity extends AppCompatActivity {
         loadImgToView(petImage);
     }
 
+    // Take photo with built in camera
     public void changeImage(View view){
         dispatchTakePictureIntent();
     }
@@ -60,6 +63,7 @@ public class PetInfoActivity extends AppCompatActivity {
     //region Take and Save Photo
     static final int REQUEST_IMAGE_CAPTURE = 1;
 
+    // Takes photo with the camera app
     private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         // Ensure that there's a camera activity to handle the intent
@@ -85,6 +89,7 @@ public class PetInfoActivity extends AppCompatActivity {
         }
     }
 
+    // Creates the image file in the directory
     private File createImageFile() throws IOException {
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
@@ -101,6 +106,7 @@ public class PetInfoActivity extends AppCompatActivity {
         return image;
     }
 
+    // After the photo has been taken
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
@@ -109,12 +115,14 @@ public class PetInfoActivity extends AppCompatActivity {
     }
     //endregion
 
+    // Save the changes made
     public void onSaveClicked(View view){
         // Get data from UI
         String petName = txtPetName.getText().toString();
         String petDateOfBirth = txtPetDateOfBirth.getText().toString();
         String petImage = imgPetImage.getTag().toString();
 
+        // validate date
         if (!validDate(petDateOfBirth)) {
             new AlertDialog.Builder(this)
                     .setTitle(R.string.error)
@@ -141,6 +149,7 @@ public class PetInfoActivity extends AppCompatActivity {
         Toast.makeText(this, R.string.save_successful, Toast.LENGTH_SHORT).show();
     }
 
+    // Confirms whether the given date string is valid or not.
     private Boolean validDate(String date){
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
         Date tempDate;
@@ -175,16 +184,32 @@ public class PetInfoActivity extends AppCompatActivity {
         return true;
     }
 
-
+    // Loads an image at the given path to the imageView for this activity
     private void loadImgToView(String imagePath){
-        try{
+        try{                        // if image is resource icon
             int imageResource = Integer.parseInt(imagePath);
             imgPetImage.setImageResource(imageResource);
             imgPetImage.setTag(imagePath);
-        }catch(Exception ex) {
+        }catch(Exception ex) {      // if image is camera photo
             Bitmap imageBitmap = BitmapFactory.decodeFile(imagePath);
             imgPetImage.setImageBitmap(imageBitmap);
             imgPetImage.setTag(imagePath);
         }
+    }
+
+    // Request save before leaving
+    @Override
+    public void onBackPressed() {
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.save)
+                .setMessage(R.string.save_request)
+                .setPositiveButton(R.string.yes, ((dialog, which) -> {
+                    onSaveClicked(null);
+                    super.onBackPressed();
+                }))
+                .setNegativeButton(R.string.no, ((dialog, which) -> {
+                    super.onBackPressed();
+                }))
+                .show();
     }
 }

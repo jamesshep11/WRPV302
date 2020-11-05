@@ -31,14 +31,15 @@ public class JournalEntryActivity extends AppCompatActivity {
 
     private Broker broker;
 
+    // Reference to UI components
     ImageView imgEntryImage;
     EditText txtEntryDate, txtEntryText;
     Spinner txtEntryType;
     ConstraintLayout journalEntryLayout;
 
-    Entry thisEntry;
-    int pos;
-    String newCameraImagePath;
+    Entry thisEntry;                // The current entry
+    int pos;                        // The position of the current entry in the list (list.size() for new entries)
+    String newCameraImagePath;      // The absolutePath to the image taken with the camera
 
     // Link Entry type with entryImage and entryColor
     private AdapterView.OnItemSelectedListener colorImageListener = new AdapterView.OnItemSelectedListener() {
@@ -103,13 +104,13 @@ public class JournalEntryActivity extends AppCompatActivity {
         txtEntryText = findViewById(R.id.txtEntryText);
         journalEntryLayout = findViewById(R.id.journalEntryLayout);
 
-        // Extract data from intent
+        // Extract data from intent and build the current entry
         Intent thisIntent = getIntent();
         pos = thisIntent.getIntExtra("pos", getSharedPreferences("entryImages", MODE_PRIVATE).getAll().size());
         String img = thisIntent.getStringExtra("image");
-        img = (img != null) ? img : Integer.toString(R.drawable.vet);                                                // default image matches default type
+            img = (img != null) ? img : Integer.toString(R.drawable.vet);                                        // default image matches default type
         String date = thisIntent.getStringExtra("date");
-        date = (date != null) ? date : new SimpleDateFormat("yyyy/MM/dd").format(new Date());                 // default date is today
+            date = (date != null) ? date : new SimpleDateFormat("yyyy/MM/dd").format(new Date());         // default date is today
         int type = thisIntent.getIntExtra("type", 0);
         String text = thisIntent.getStringExtra("text");
         Boolean hasPhoto = thisIntent.getBooleanExtra("hasPhoto", false);
@@ -129,6 +130,7 @@ public class JournalEntryActivity extends AppCompatActivity {
             txtEntryType.setOnItemSelectedListener(colorImageListener);
     }
 
+    // Confirms whether the given date string is valid or not.
     private Boolean validDate(String date){
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
         Date tempDate;
@@ -163,18 +165,20 @@ public class JournalEntryActivity extends AppCompatActivity {
         return true;
     }
 
+    // Loads an image at the given path to the imageView for this activity
     private void loadImgToView(String imagePath){
-        try{
+        try{                        // if image is resource icon
             int imageResource = Integer.parseInt(imagePath);
             imgEntryImage.setImageResource(imageResource);
             imgEntryImage.setTag(imagePath);
-        }catch(Exception ex) {
+        }catch(Exception ex) {      // if image is camera photo
             Bitmap imageBitmap = BitmapFactory.decodeFile(imagePath);
             imgEntryImage.setImageBitmap(imageBitmap);
             imgEntryImage.setTag(imagePath);
         }
     }
 
+    // Take photo with built in camera
     public void changeImage(View view){
         dispatchTakePictureIntent();
     }
@@ -182,6 +186,7 @@ public class JournalEntryActivity extends AppCompatActivity {
     //region Take and Save Photo
     static final int REQUEST_IMAGE_CAPTURE = 1;
 
+    // Takes photo with the camera app
     private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         // Ensure that there's a camera activity to handle the intent
@@ -207,6 +212,7 @@ public class JournalEntryActivity extends AppCompatActivity {
         }
     }
 
+    // Creates the image file in the directory
     private File createImageFile() throws IOException {
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
@@ -223,6 +229,7 @@ public class JournalEntryActivity extends AppCompatActivity {
         return image;
     }
 
+    // After the photo has been taken
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
@@ -232,6 +239,7 @@ public class JournalEntryActivity extends AppCompatActivity {
     }
     //endregion
 
+    // Save the changes made
     public void onSaveClicked(View view){
         // Get data  from UI
         thisEntry.setImage(imgEntryImage.getTag().toString());
@@ -256,5 +264,21 @@ public class JournalEntryActivity extends AppCompatActivity {
         params.put("entry", thisEntry);
         params.put("pos", pos);
         broker.publish(this, "SaveEntry", params);
+    }
+
+    // Request save before leaving
+    @Override
+    public void onBackPressed() {
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.save)
+                .setMessage(R.string.save_request)
+                .setPositiveButton(R.string.yes, ((dialog, which) -> {
+                    onSaveClicked(null);
+                    super.onBackPressed();
+                }))
+                .setNegativeButton(R.string.no, ((dialog, which) -> {
+                    super.onBackPressed();
+                }))
+                .show();
     }
 }

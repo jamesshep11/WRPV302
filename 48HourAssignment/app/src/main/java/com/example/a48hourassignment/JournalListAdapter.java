@@ -28,8 +28,10 @@ class JournalListAdapter extends RecyclerView.Adapter<JournalListAdapter.entryVi
     private Broker broker;
     private Context context;
 
-    static private JournalListAdapter instance = null;      // singleton instance
+    // Singleton instance
+    static private JournalListAdapter instance = null;
 
+    // Get singleton instance
     static public JournalListAdapter getInstance(Context context){
         if(instance == null)
             instance = new JournalListAdapter(context);
@@ -37,6 +39,7 @@ class JournalListAdapter extends RecyclerView.Adapter<JournalListAdapter.entryVi
         return instance;
     }
 
+    // Private constructor
     private JournalListAdapter(Context context) {
         this.context = context;
         implementPubSub();
@@ -53,20 +56,25 @@ class JournalListAdapter extends RecyclerView.Adapter<JournalListAdapter.entryVi
     @Override
     public void onBindViewHolder(@NonNull entryViewHolder holder, int position) {
 
+        // Get the entry at the given position
         Entry currentEntry = getEntryAt(position);
 
+        // load info to UI
         holder.entryDate.setText(currentEntry.getDate());
         holder.entryText.setText(currentEntry.getText());
         loadImgToView(holder.entryImage, currentEntry.getImage());
+        // Set imageView Size based on icon/photo
         if (!currentEntry.hasPhoto()) {
             ViewGroup.LayoutParams imageViewParams = holder.entryImage.getLayoutParams();
             imageViewParams.height *= 0.5;
             holder.entryImage.setLayoutParams(imageViewParams);
         }
 
+        // Open JournalEntry Activity when entry is clicked
         holder.entryCard.setOnClickListener(view->{
             Intent entryActivity = new Intent(context, JournalEntryActivity.class);
 
+            // entry data as extras
             entryActivity.putExtra("pos", position);
             entryActivity.putExtra("image", currentEntry.getImage());
             entryActivity.putExtra("date", currentEntry.getDate());
@@ -95,6 +103,7 @@ class JournalListAdapter extends RecyclerView.Adapter<JournalListAdapter.entryVi
         return context.getSharedPreferences("entryImages", MODE_PRIVATE).getAll().size();
     }
 
+    // Implement the pubSub functionality
     public void implementPubSub(){
         broker = Broker.getInstance();
         broker.subscribe("SaveEntry", (publisher, topic, params)->{
@@ -113,27 +122,32 @@ class JournalListAdapter extends RecyclerView.Adapter<JournalListAdapter.entryVi
         });
     }
 
+    // Get entry from shared prefs at given position
     private Entry getEntryAt(int position){
         String pos = Integer.toString(position);
 
+        // Get shared prefs
         SharedPreferences preferenceImages = context.getSharedPreferences("entryImages", MODE_PRIVATE);
         SharedPreferences preferenceDates = context.getSharedPreferences("entryDates", MODE_PRIVATE);
         SharedPreferences preferenceTypes = context.getSharedPreferences("entryTypes", MODE_PRIVATE);
         SharedPreferences preferenceTexts = context.getSharedPreferences("entryTexts", MODE_PRIVATE);
         SharedPreferences preferenceHasPhoto = context.getSharedPreferences("entryHasPhoto", MODE_PRIVATE);
 
+        // Extract data from prefs
         String image = preferenceImages.getString(pos, Integer.toString(R.drawable.vet));
         String date = preferenceDates.getString(pos, "");
         int type = preferenceTypes.getInt(pos, 0);
         String text = preferenceTexts.getString(pos, "");
         Boolean hasPhoto = preferenceHasPhoto.getBoolean(pos, false);
 
+        // Build entry with above data
         Entry entry = new Entry(image, date, type, text);
         entry.setHasPhoto(hasPhoto);
 
         return entry;
     }
 
+    // Set entry in shared prefs at given position
     private void putEntryAt(int position, Entry entry){
         // Get shared prefs
         SharedPreferences preferenceImages = context.getSharedPreferences("entryImages", MODE_PRIVATE);
@@ -165,6 +179,7 @@ class JournalListAdapter extends RecyclerView.Adapter<JournalListAdapter.entryVi
         hasPhotoEditor.apply();
     }
 
+    // Sort the list desc by date
     private void sortList(){
         ArrayList<Entry> list = new ArrayList<>();
 
@@ -180,6 +195,7 @@ class JournalListAdapter extends RecyclerView.Adapter<JournalListAdapter.entryVi
             putEntryAt(i, list.get(i));
     }
 
+    // Loads an image at the given path to the given imageView for this activity
     private void loadImgToView(ImageView imageView, String imagePath){
         try{
             int imageResource = Integer.parseInt(imagePath);

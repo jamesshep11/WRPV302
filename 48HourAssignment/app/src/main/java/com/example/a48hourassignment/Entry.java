@@ -1,7 +1,5 @@
 package com.example.a48hourassignment;
 
-import java.util.Comparator;
-
 public class Entry {
     private int type;
     private String date, text, image;
