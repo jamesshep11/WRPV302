@@ -7,6 +7,8 @@ import androidx.core.content.FileProvider;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -16,7 +18,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import java.io.Console;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -27,7 +28,7 @@ public class PetInfoActivity extends AppCompatActivity {
     ImageView imgPetImage;
     EditText txtPetName, txtPetDateOfBirth;
 
-    String currentPhotoPath;
+    String petPhotoPath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,13 +44,12 @@ public class PetInfoActivity extends AppCompatActivity {
         SharedPreferences preferencePetInfo = getSharedPreferences("petInfo", MODE_PRIVATE);
         String petName = preferencePetInfo.getString("petName", "");
         String petDateOfBirth = preferencePetInfo.getString("petDateOfBirth", "");
-        int petImage = preferencePetInfo.getInt("petImage", R.drawable.ic_launcher_foreground);
+        String petImage = preferencePetInfo.getString("petImage", Integer.toString(R.drawable.ic_launcher_foreground));
 
         // Load data to UI components
         txtPetName.setText(petName);
         txtPetDateOfBirth.setText(petDateOfBirth);
-        imgPetImage.setImageResource(petImage);
-        imgPetImage.setTag(petImage);
+        loadImgToView(petImage);
     }
 
     public void changeImage(View view){
@@ -96,16 +96,14 @@ public class PetInfoActivity extends AppCompatActivity {
         );
 
         // Save a file: path for use with ACTION_VIEW intents
-        currentPhotoPath = image.getAbsolutePath();
+        petPhotoPath = image.getAbsolutePath();
         return image;
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            Bundle extras = data.getExtras();
-            Bitmap imageBitmap = (Bitmap) extras.get("data");
-            imgPetImage.setImageBitmap(imageBitmap);
+            loadImgToView(petPhotoPath);
         }
     }
     //endregion
@@ -114,7 +112,7 @@ public class PetInfoActivity extends AppCompatActivity {
         // Get data from UI
         String petName = txtPetName.getText().toString();
         String petDateOfBirth = txtPetDateOfBirth.getText().toString();
-        int petImage = Integer.parseInt(imgPetImage.getTag().toString());
+        String petImage = imgPetImage.getTag().toString();
 
         if (!validDate(petDateOfBirth)) {
             new AlertDialog.Builder(this)
@@ -134,7 +132,7 @@ public class PetInfoActivity extends AppCompatActivity {
         // Change shared prefs
         petEditor.putString("petName", petName);
         petEditor.putString("petDateOfBirth", petDateOfBirth);
-        petEditor.putInt("petImage", petImage);
+        petEditor.putString("petImage", petImage);
 
         // Apply changes
         petEditor.apply();
@@ -174,5 +172,18 @@ public class PetInfoActivity extends AppCompatActivity {
             return false;
 
         return true;
+    }
+
+
+    private void loadImgToView(String imagePath){
+        try{
+            int imageResource = Integer.parseInt(imagePath);
+            imgPetImage.setImageResource(imageResource);
+            imgPetImage.setTag(imagePath);
+        }catch(Exception ex) {
+            Bitmap imageBitmap = BitmapFactory.decodeFile(imagePath);
+            imgPetImage.setImageBitmap(imageBitmap);
+            imgPetImage.setTag(imagePath);
+        }
     }
 }
