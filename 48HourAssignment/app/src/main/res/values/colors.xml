@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#008577</color>
+    <color name="colorPrimaryDark">#00574B</color>
+    <color name="colorAccent">#D81B60</color>
+    <color name="vet">#FFFFF176</color>
+    <color name="medication">#FF81C784</color>
+    <color name="appointment">#7986CB</color>
+    <color name="selfie">#FFE57373</color>
+</resources>
