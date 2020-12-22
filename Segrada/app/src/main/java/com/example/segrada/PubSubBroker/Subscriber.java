@@ -1,4 +1,4 @@
-package PubSubBroker;
+package com.example.segrada.PubSubBroker;
 
 import java.util.Map;
 
