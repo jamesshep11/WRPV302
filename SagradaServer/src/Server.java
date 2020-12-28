@@ -38,7 +38,7 @@ public class Server {
 	public void run() {
 		try {
 			// Step 1: Create a ServerSocket.
-			server = new ServerSocket(5001, 100);
+			server = new ServerSocket(500, 100);
 			display("Started server: " + InetAddress.getLocalHost().getHostAddress());
 
 			while (true) {
@@ -69,7 +69,7 @@ public class Server {
 	// Send message to client
 	public void sendMessage(String message) {
 		try {
-			message = "SERVER>>> " + message;
+			//message = "SERVER>>> " + message;
 
 			// Send String OBJECT to client.
 			oos.writeObject(message);
@@ -107,7 +107,7 @@ public class Server {
 	private void readMessages() throws IOException {
 		// Send initial message to client.
 		String message = "Connection successful. Client #" + counter;
-		sendMessage(message);
+		sendMessage("Testing");
 
 		// Connected
 		if(onConnected != null) onConnected.run();

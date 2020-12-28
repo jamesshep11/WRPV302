@@ -17,7 +17,7 @@ public class Broker {
         return instance;
     }
 
-    public void subscribe(Subscriber subscriber, String topic) {
+    public void subscribe(String topic, Subscriber subscriber) {
         // Get subscribers for this topic. If none, create a new set.
         Set<Subscriber> subscriberSet = subscribers.computeIfAbsent(topic, key -> new HashSet<>());
         subscriberSet.add(subscriber);
