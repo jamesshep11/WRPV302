@@ -1,3 +1,4 @@
+import PubSubBroker.Broker;
 import javafx.application.Platform;
 
 import java.io.EOFException;
@@ -7,6 +8,7 @@ import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 
 public class Server {
 	// Server related fields.
@@ -14,82 +16,70 @@ public class Server {
 	private ObjectInputStream ois;
 	private ServerSocket server;
 	private Socket connection;
-	private int counter = 1;
 
 	private Runnable onConnected;
 	private Runnable onDisconnected;
 
+	private Broker broker;
+
+	private ArrayList<Client> clients;
+	private ArrayList<Game> games;
+
 	public Server(Runnable onConnected, Runnable onDisconnected) {
 		this.onConnected = onConnected;
 		this.onDisconnected = onDisconnected;
-		run();
-	}
 
-	public static void main(String args[]) {
-		new Server(null, // What to do when connected (run on UI thread).
-				null // What to do when connected (run on UI thread).
-		);
-	}
+		broker = Broker.getInstance();
+		broker.subscribe("CloseConnection", ((publisher, topic, params) -> ((Client)params.get("client")).closeConnection()));
 
-	protected void display(String message) {
-		System.out.println(message);
+		clients = new ArrayList<>();
+		games = new ArrayList<>();
 	}
 
 	public void run() {
 		try {
-			// Step 1: Create a ServerSocket.
+			// Create server socket.
 			server = new ServerSocket(500, 100);
-			display("Started server: " + InetAddress.getLocalHost().getHostAddress());
+			System.out.println("Started server: " + InetAddress.getLocalHost().getHostAddress());
 
+			// Get 4 clients for a game
 			while (true) {
-				// Step 2: Wait for a connection.
-				waitForConnection();
+				try {
+					for (int i = 1; i <= 4; i++) {
+						waitForConnection(i);
+						getStreams();
 
-				// Step 3: Get input and output streams.
-				getStreams();
+						//Create client using global values from waitingForConn() and getStreams()
+						Client client = new Client(connection, oos, ois);
+						clients.add(client);
 
-				// Step 4: Process connection.
-				readMessages();
-
-				// Step 5: Close connection.
-				closeConnection();
-
-				++counter;
+						System.out.println("Added client #" + clients.size() + 1);
+					}
+				}
+				catch (EOFException eofException) {
+					System.out.println("Client terminated connection");
+				}
+				catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
-		}
-		catch (EOFException eofException) {
-			display("Client terminated connection");
-
 		}
 		catch (IOException ioException) {
 			ioException.printStackTrace();
 		}
 	}
 
-	// Send message to client
-	public void sendMessage(String message) {
-		try {
-			//message = "SERVER>>> " + message;
-
-			// Send String OBJECT to client.
-			oos.writeObject(message);
-			// Flush to ensure that data is pushed through stream to client.
-			oos.flush();
-
-			display(message);
-
-		} catch (IOException ioException) {
-			display("Error writing object. " + ioException.getMessage());
-		}
-	}
-
 	// Wait for connection to arrive, then display connection info
-	private void waitForConnection() throws IOException {
-		display("Waiting for connection...");
+	private void waitForConnection(int i) throws IOException {
+		System.out.println("Waiting for player " + i);
 
 		connection = server.accept();
 
-		display("Connection #" + counter + " received from: "
+		// Connected
+		if(onConnected != null) onConnected.run();
+
+		// size()+2 because connection exists but client not added to list yet
+		System.out.println("Connection #" + clients.size()+2 + " received from: "
 				+ connection.getInetAddress().getHostName());
 	}
 
@@ -100,37 +90,7 @@ public class Server {
 
 		ois = new ObjectInputStream(connection.getInputStream());
 
-		display("Got I/O streams.");
-	}
-
-	// Process connection with client
-	private void readMessages() throws IOException {
-		// Send initial message to client.
-		String message = "Connection successful. Client #" + counter;
-		sendMessage("Testing");
-
-		// Connected
-		if(onConnected != null) onConnected.run();
-
-		do {
-			try {
-				message = (String) ois.readObject();
-				display(message);
-
-			} catch (ClassNotFoundException classNotFoundException) {
-				display("Unknown object type received.");
-			}
-
-		} while (!message.equals("CLIENT>>> TERMINATE"));
-	}
-
-	// close streams and socket
-	private void closeConnection() throws IOException {
-		display("User terminated connection.");
-		oos.close();
-		ois.close();
-		connection.close();
-
-		if(onDisconnected != null) onDisconnected.run();
+		// size()+2 because connection exists but client not added to list yet
+		System.out.println("Got I/O streams for client #" + clients.size()+2);
 	}
 }

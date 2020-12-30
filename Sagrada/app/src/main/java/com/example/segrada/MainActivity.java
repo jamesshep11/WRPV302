@@ -26,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //region Connect to Server
         EditText input = new EditText(this);
         new AlertDialog.Builder(this)
                 .setTitle("Network")
@@ -37,10 +38,14 @@ public class MainActivity extends AppCompatActivity {
                     client.start();
                 }))
                 .show();
+        //endregion
 
+        // Set up PubSubBroker
         broker = Broker.getInstance();
         broker.subscribe("Testing", ((publisher, topic, params) -> {
-            System.out.println("Testing Successful");
+            new AlertDialog.Builder(this)
+                    .setMessage("Testing Successful")
+                    .show();
         }));
     }
 
