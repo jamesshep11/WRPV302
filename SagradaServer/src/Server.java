@@ -17,18 +17,12 @@ public class Server {
 	private ServerSocket server;
 	private Socket connection;
 
-	private Runnable onConnected;
-	private Runnable onDisconnected;
-
 	private Broker broker;
 
 	private ArrayList<Client> clients;
 	private ArrayList<Game> games;
 
-	public Server(Runnable onConnected, Runnable onDisconnected) {
-		this.onConnected = onConnected;
-		this.onDisconnected = onDisconnected;
-
+	public Server() {
 		broker = Broker.getInstance();
 		broker.subscribe("CloseConnection", ((publisher, topic, params) -> ((Client)params.get("client")).closeConnection()));
 
@@ -74,9 +68,6 @@ public class Server {
 		System.out.println("Waiting for player " + i);
 
 		connection = server.accept();
-
-		// Connected
-		if(onConnected != null) onConnected.run();
 
 		// size()+2 because connection exists but client not added to list yet
 		System.out.println("Connection #" + clients.size()+2 + " received from: "
