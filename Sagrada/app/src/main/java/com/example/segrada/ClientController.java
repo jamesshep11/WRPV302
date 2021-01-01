@@ -51,7 +51,6 @@ public class ClientController extends Thread {
             while (running) {
                 Map<String, Object> message = (Map<String, Object>) ois.readObject();
                 broker.publish(this, (String) message.get("topic"), message);
-                System.out.println("SERVER>>> " + message.get("topic"));
             }
         }
         catch (Exception e) {

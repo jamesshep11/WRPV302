@@ -1,4 +1,4 @@
 <resources>
     <string name="app_name">Sagrada</string>
-    <string name="startGame">Click to Start</string>
+    <string name="Wiating_for_players">Waiting for players to join</string>
 </resources>

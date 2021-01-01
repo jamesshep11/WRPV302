@@ -12,6 +12,8 @@ import com.example.segrada.PubSubBroker.Broker;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Map;
 
 import static androidx.core.os.LocaleListCompat.create;
 
@@ -42,15 +44,12 @@ public class MainActivity extends AppCompatActivity {
 
         // Set up PubSubBroker
         broker = Broker.getInstance();
-        broker.subscribe("Testing", ((publisher, topic, params) -> {
-            new AlertDialog.Builder(this)
-                    .setMessage("Testing Successful")
-                    .show();
-        }));
+        broker.subscribe("startGame", ((publisher, topic, params) -> startGame(params)));
     }
 
-    public void startGame(View view){
-        Intent intent = new Intent(this, this.getClass());
+    private void startGame(Map<String, Object> params){
+        Intent intent = new Intent(this, GamePlay.class);
         startActivity(intent);
+        finish();
     }
 }
