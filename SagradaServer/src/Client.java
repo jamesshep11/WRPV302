@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.Map;
+import java.util.HashMap;
 
 public class Client {
     private Socket connection;
@@ -12,25 +12,47 @@ public class Client {
     private ObjectInputStream ois;
 
     private Broker broker;
+    private boolean running;
 
-    public Client(Socket connection, ObjectOutputStream oos, ObjectInputStream ois) {
+    public Client(Socket connection, Broker broker) {
         this.connection = connection;
-        this.oos = oos;
-        this.ois = ois;
-        broker = Broker.getInstance();
+        getStreams();
+        this.broker = broker;
+        this.running = true;
 
-        readMessages();
+        this.broker.subscribe("CloseConnection", ((publisher, topic, params) -> running = false));
+
+        readObjects();
     }
 
-    private void readMessages(){
+    // Get streams to send and receive data
+    private void getStreams() {
+        try {
+            oos = new ObjectOutputStream(connection.getOutputStream());
+            oos.flush();
+
+            ois = new ObjectInputStream(connection.getInputStream());
+        }
+        catch (IOException e){
+            e.printStackTrace();
+        }
+    }
+
+    // This is the only method that needs to be customized for the given project
+    // Defines how to handle input received from the client
+    private void handleInput(Object object){
+        HashMap<String, Object> params = (HashMap<String, Object>) object;
+        broker.publish(this, (String)params.get("topic"), params);
+    }
+
+    private void readObjects(){
         new Thread(() -> {
             try {
-                Map<String, Object> message;
                 do {
                     // Read message from Client
-                    message = (Map<String, Object>) ois.readObject();
-                    broker.publish(this, (String)message.get("topic"), message);
-                } while (!message.get("topic").equals("TERMINATE"));
+                    Object object = ois.readObject();
+                    handleInput(object);
+                } while (running);
             }
             catch (IOException e){
                 e.printStackTrace();
@@ -38,23 +60,27 @@ public class Client {
             catch (ClassNotFoundException classNotFoundException) {
                 System.out.println("Unknown object type received.");
             }
-        }).start();
-    }
-
-    public void sendMessage(Object message){
-        new Thread(() -> {
-            try {
-                // Send String OBJECT to client.
-                oos.writeObject(message);
-                // Flush to ensure that data is pushed through stream to client.
-                oos.flush();
-            } catch (IOException ioException) {
-                System.out.println("Error writing object. " + ioException.getMessage());
+            finally{
+                closeConnection();
             }
         }).start();
     }
 
-    public void closeConnection(){
+    public void sendObjects(Object object){
+        new Thread(() -> {
+            try {
+                // Send String OBJECT to client.
+                oos.writeObject(object);
+                // Flush to ensure that data is pushed through stream to client.
+                oos.flush();
+            } catch (IOException ioException) {
+                System.out.println("Error writing object. " + ioException.getMessage());
+                ioException.printStackTrace();
+            }
+        }).start();
+    }
+
+    private void closeConnection(){
         System.out.println("User terminated connection.");
         try {
             oos.close();

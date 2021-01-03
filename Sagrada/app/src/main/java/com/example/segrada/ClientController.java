@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.HashMap;
 import java.util.Map;
 
 public class ClientController extends Thread {
@@ -20,21 +21,34 @@ public class ClientController extends Thread {
         super(serverAddress);
         this.serverAddress = serverAddress;
         broker = Broker.getInstance();
-        broker.subscribe("CloseConnection", ((publisher, topic, params) -> running = false));
+        broker.subscribe("CloseConnection", ((publisher, topic, params) -> {
+            params.put("topic", "EndGame");
+            sendObject(params);
+            running = false;
+        }));
+        broker.subscribe("EndGame", ((publisher, topic, params) -> running = false));
+
         running = false;
     }
 
-    // Send a message to the server.
-    private void sendMessage(Map<String, Object> message) {
+    // Send an object to the server.
+    private void sendObject(Map<String, Object> message) {
         new Thread(() -> {
             try {
                 oos.writeObject(message);
                 oos.flush();
-                System.out.println("CLIENT>>> " + message);
+                System.out.println("CLIENT>>> " + message.get("topic"));
             } catch (IOException ioException) {
             System.out.println("ERROR: Error writing object");
         }
         }).start();
+    }
+
+    // Read an object from the server
+    private void readObject() throws IOException, ClassNotFoundException {
+        HashMap<String, Object> message = (HashMap<String, Object>) ois.readObject();
+        broker.publish(this, (String) message.get("topic"), message);
+        System.out.println("SERVER>>> " + message.get("topic"));
     }
 
     @Override
@@ -48,13 +62,12 @@ public class ClientController extends Thread {
 
             running = true;
             // Read messages from server until told to terminate.
-            while (running) {
-                Map<String, Object> message = (Map<String, Object>) ois.readObject();
-                broker.publish(this, (String) message.get("topic"), message);
-            }
+            while (running)
+                readObject();
         }
         catch (Exception e) {
             System.out.println("ERROR: " + e.getMessage());
+            e.printStackTrace();
         }
         finally {
             // Close connection.
@@ -66,10 +79,10 @@ public class ClientController extends Thread {
 
     // Get and initialise streams.
     private void getStreams() throws IOException {
+        ois = new ObjectInputStream(conn.getInputStream());
+
         oos = new ObjectOutputStream(conn.getOutputStream());
         oos.flush();
-
-        ois = new ObjectInputStream(conn.getInputStream());
 
         System.out.println("Got I/O streams");
     }

@@ -19,7 +19,7 @@ public class Grid implements Serializable {
         return grid[x][y];
     }
 
-    /*private boolean isValid(GridBlock block){
+    /*private boolean isValid(com.example.segrada.GridBlock block){
 
     }*/
 

@@ -1,4 +1,5 @@
 import PubSubBroker.Broker;
+import PubSubBroker.Subscriber;
 import javafx.application.Platform;
 
 import java.io.EOFException;
@@ -9,24 +10,21 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Map;
 
 public class Server {
 	// Server related fields.
-	private ObjectOutputStream oos;
-	private ObjectInputStream ois;
 	private ServerSocket server;
 	private Socket connection;
 
 	private Broker broker;
 
-	private ArrayList<Client> clients;
 	private ArrayList<Game> games;
 
 	public Server() {
-		broker = Broker.getInstance();
-		broker.subscribe("CloseConnection", ((publisher, topic, params) -> ((Client)params.get("client")).closeConnection()));
+		broker = new Broker();
+		broker.subscribe("EndGame", ((publisher, topic, params) -> endGame((Game)publisher)));
 
-		clients = new ArrayList<>();
 		games = new ArrayList<>();
 	}
 
@@ -36,19 +34,30 @@ public class Server {
 			server = new ServerSocket(500, 100);
 			System.out.println("Started server: " + InetAddress.getLocalHost().getHostAddress());
 
-			// Get 4 clients for a game
+			// Listen for clients and start new games
 			while (true) {
 				try {
-					for (int i = 1; i <= 4; i++) {
-						waitForConnection(i);
-						getStreams();
+					// Initialize new client list and broker for a new game
+					ArrayList<Client> clients = new ArrayList<>();
+					Broker gameBroker = new Broker();
+					// In case a client leaves before the game starts
+					Subscriber removeClient = (publisher, topic, params) -> clients.remove(publisher);
+					gameBroker.subscribe("CloseConnection", removeClient);
+
+					// Wait for 4 clients to join
+					//while (clients.size() < 4) {
+						waitForConnection(clients.size()+1);
 
 						//Create client using global values from waitingForConn() and getStreams()
-						Client client = new Client(connection, oos, ois);
+						Client client = new Client(connection, gameBroker);
 						clients.add(client);
 
-						System.out.println("Added client #" + clients.size() + 1);
-					}
+						System.out.println("Added client #" + clients.size());
+					//}
+					gameBroker.unsubscribe(removeClient);
+					// Start new game with the given clients, their shared broker and the serverBroker
+					Game newGame = new Game(clients, gameBroker, broker);
+					games.add(newGame);
 				}
 				catch (EOFException eofException) {
 					System.out.println("Client terminated connection");
@@ -68,20 +77,9 @@ public class Server {
 		System.out.println("Waiting for player " + i);
 
 		connection = server.accept();
-
-		// size()+2 because connection exists but client not added to list yet
-		System.out.println("Connection #" + clients.size()+2 + " received from: "
-				+ connection.getInetAddress().getHostName());
 	}
 
-	// Get streams to send and receive data
-	private void getStreams() throws IOException {
-		oos = new ObjectOutputStream(connection.getOutputStream());
-		oos.flush();
-
-		ois = new ObjectInputStream(connection.getInputStream());
-
-		// size()+2 because connection exists but client not added to list yet
-		System.out.println("Got I/O streams for client #" + clients.size()+2);
+	private void endGame(Game game){
+		games.remove(game);
 	}
 }

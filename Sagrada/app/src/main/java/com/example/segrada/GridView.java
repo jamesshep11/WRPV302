@@ -5,12 +5,15 @@ import android.graphics.Color;
 import android.widget.Button;
 
 import java.io.Serializable;
+import java.lang.reflect.Field;
 
 public class GridView {
 
     private GamePlayFragment context;
     private Grid grid;
     private Button[][] buttons;
+
+    private final int[] dieVals = {R.drawable.zero, R.drawable.one, R.drawable.two, R.drawable.three, R.drawable.four, R.drawable.five, R.drawable.six};
 
     public GridView(GamePlayFragment context) {
         this.context = context;
@@ -52,9 +55,20 @@ public class GridView {
                 GridBlock block = gridBlocks[x][y];
                 Button button = buttons[x][y];
 
-                button.setText(block.getValue());
-                button.setBackgroundColor(block.getColor().hashCode());
+                button.setBackground(context.getResources().getDrawable(dieVals[block.getValue()]));
+                int colorResId = getResId(block.getColor(), R.color.class);
+                button.setBackgroundTintList(context.getResources().getColorStateList(colorResId));
             }
+    }
+
+    private int getResId(String rec, Class<?> aClass) {
+        try {
+            Field field = aClass.getDeclaredField(rec);
+            return field.getInt(field);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return -1;
+        }
     }
 
     public Grid getGrid(){

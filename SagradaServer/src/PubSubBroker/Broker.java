@@ -4,18 +4,18 @@ import java.util.*;
 
 public class Broker {
 
-    static private Broker instance = null;              // Singleton instance of the broker.
+    //static private Broker instance = null;              // Singleton instance of the broker.
     private Map<String, Set<Subscriber>> subscribers;   // Collection of subscribers and which topics they're subscribed to
 
-    private Broker() {
+    public Broker() {
         subscribers = new HashMap<>();
     }
-    static public Broker getInstance() {
+    /*static public Broker getInstance() {
         if(instance == null)
             instance = new Broker();
 
         return instance;
-    }
+    }*/
 
     public void subscribe(String topic, Subscriber subscriber) {
         // Get subscribers for this topic. If none, create a new set.

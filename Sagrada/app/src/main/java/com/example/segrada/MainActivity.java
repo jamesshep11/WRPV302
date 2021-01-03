@@ -23,10 +23,15 @@ public class MainActivity extends AppCompatActivity {
     private Broker broker;
     private String serverAddress = "";
 
+    public static String PACKAGE_NAME;
+    private Map<String, Object> initParams;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        PACKAGE_NAME = getApplicationContext().getPackageName();
 
         //region Connect to Server
         EditText input = new EditText(this);
@@ -44,12 +49,20 @@ public class MainActivity extends AppCompatActivity {
 
         // Set up PubSubBroker
         broker = Broker.getInstance();
-        broker.subscribe("startGame", ((publisher, topic, params) -> startGame(params)));
+        broker.subscribe("StartGame", (publisher, topic, params) -> {
+            initParams = params;
+            startGame();
+        });
+        broker.subscribe("GameStarted", ((publisher, topic, params) -> init(initParams)));
     }
 
-    private void startGame(Map<String, Object> params){
+    private void startGame(){
         Intent intent = new Intent(this, GamePlay.class);
         startActivity(intent);
+    }
+
+    private void init(Map<String, Object> params){
+        broker.publish(this, "Init", params);
         finish();
     }
 }

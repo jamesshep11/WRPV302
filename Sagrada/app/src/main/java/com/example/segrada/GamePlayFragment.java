@@ -22,10 +22,12 @@ public class GamePlayFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String Active = "Active";
     private static final String GRID = "Grid";
+    private static final String COLOR = "Color";
 
     // TODO: Rename and change types of parameters
     private Grid grid;
     private GridView gridView;
+    private String color;
     private boolean active;
 
 
@@ -42,14 +44,17 @@ public class GamePlayFragment extends Fragment {
      * @return A new instance of fragment GamePlayFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static GamePlayFragment newInstance(boolean active, Grid grid) {
+    public static GamePlayFragment newInstance(boolean active, Grid grid, String color) {
         GamePlayFragment fragment = new GamePlayFragment();
         Bundle args = new Bundle();
         args.putBoolean(Active, active);
         args.putSerializable(GRID, grid);
+        args.putString(COLOR, color);
         fragment.setArguments(args);
         return fragment;
     }
+
+    private void init(){}
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -57,6 +62,7 @@ public class GamePlayFragment extends Fragment {
         if (getArguments() != null) {
             active = getArguments().getBoolean(Active);
             grid = (Grid)getArguments().getSerializable(GRID);
+            color = getArguments().getString(COLOR);
         }
         gridView = new GridView(this);
     }
@@ -74,5 +80,9 @@ public class GamePlayFragment extends Fragment {
 
         gridView.connectToUI();
         gridView.loadGrid(grid);
+    }
+
+    public boolean isActive(){
+        return active;
     }
 }
