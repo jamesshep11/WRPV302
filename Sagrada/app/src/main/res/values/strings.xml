@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Sagrada</string>
-    <string name="Wiating_for_players">Waiting for players to join</string>
+    <string name="Waiting_for_players">Waiting for players to join</string>
+    <string name="Player">Player %1$d</string>
 </resources>

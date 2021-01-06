@@ -26,7 +26,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
-        android:text="@string/Wiating_for_players"
+        android:text="@string/Waiting_for_players"
         android:textAlignment="center"
         android:textColor="#FFFFFF"
         android:textSize="36sp"

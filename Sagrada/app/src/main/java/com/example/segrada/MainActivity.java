@@ -5,21 +5,15 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.EditText;
 
 import com.example.segrada.PubSubBroker.Broker;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.Map;
-
-import static androidx.core.os.LocaleListCompat.create;
 
 public class MainActivity extends AppCompatActivity {
 
-    private ClientController client;
+    private ClientController server;
     private Broker broker;
     private String serverAddress = "";
 
@@ -41,8 +35,7 @@ public class MainActivity extends AppCompatActivity {
                 .setView(input)
                 .setPositiveButton("OK", ((dialog, which) -> {
                     serverAddress = input.getText().toString();
-                    client = new ClientController(serverAddress);
-                    client.start();
+                    server = new ClientController(serverAddress);
                 }))
                 .show();
         //endregion
@@ -51,13 +44,14 @@ public class MainActivity extends AppCompatActivity {
         broker = Broker.getInstance();
         broker.subscribe("StartGame", (publisher, topic, params) -> {
             initParams = params;
+            initParams.put("server", server);
             startGame();
         });
         broker.subscribe("GameStarted", ((publisher, topic, params) -> init(initParams)));
     }
 
     private void startGame(){
-        Intent intent = new Intent(this, GamePlay.class);
+        Intent intent = new Intent(this, GamePlayActivity.class);
         startActivity(intent);
     }
 

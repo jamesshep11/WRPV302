@@ -1,10 +1,7 @@
 package com.example.segrada;
 
-import android.content.res.Resources;
-import android.graphics.Color;
 import android.widget.Button;
 
-import java.io.Serializable;
 import java.lang.reflect.Field;
 
 public class GridView {
@@ -49,7 +46,7 @@ public class GridView {
     }
 
     public void loadGrid(Grid grid){
-        GridBlock[][] gridBlocks = grid.getGrid();
+        GridBlock[][] gridBlocks = grid.getGridBlocks();
         for (int x = 0; x <= 3; x++)
             for (int y = 0; y <= 4; y++){
                 GridBlock block = gridBlocks[x][y];

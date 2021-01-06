@@ -5,27 +5,35 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.HashMap;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingDeque;
 
 public class Client {
-    private Socket connection;
+    // Communication variable
+    private final Socket connection;
     private ObjectOutputStream oos;
     private ObjectInputStream ois;
 
-    private Broker broker;
-    private boolean running;
+    // Control input and output streams on separate threads
+    private ReadThread readThread;
+    private WriteThread writeThread;
+
+    private final Broker broker;
+
+    // Filter the output through a blocking Queue to avoid garbled output
+    private BlockingQueue<Object> objectsOut = new LinkedBlockingDeque<>();
 
     public Client(Socket connection, Broker broker) {
         this.connection = connection;
-        getStreams();
         this.broker = broker;
-        this.running = true;
+        getStreams();
 
-        this.broker.subscribe("CloseConnection", ((publisher, topic, params) -> running = false));
-
-        readObjects();
+        readThread = new ReadThread();
+        readThread.start();
+        writeThread = new WriteThread();
+        writeThread.start();
     }
 
-    // Get streams to send and receive data
     private void getStreams() {
         try {
             oos = new ObjectOutputStream(connection.getOutputStream());
@@ -38,46 +46,54 @@ public class Client {
         }
     }
 
-    // This is the only method that needs to be customized for the given project
-    // Defines how to handle input received from the client
-    private void handleInput(Object object){
-        HashMap<String, Object> params = (HashMap<String, Object>) object;
-        broker.publish(this, (String)params.get("topic"), params);
+    public void sendObject(Object object){
+        try {
+            objectsOut.put(object);
+            System.out.println(((HashMap<String, Object>)objectsOut.peek()).get("player"));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
-    private void readObjects(){
-        new Thread(() -> {
+    private class ReadThread extends Thread{
+        @Override
+        public void run() {
             try {
+                HashMap<String, Object> message;
                 do {
                     // Read message from Client
-                    Object object = ois.readObject();
-                    handleInput(object);
-                } while (running);
-            }
-            catch (IOException e){
+                    message = (HashMap<String, Object>)ois.readObject();
+                    broker.publish(this, (String)message.get("topic"), message);
+                } while (!(message.get("topic")).equals("CloseConnection"));
+            } catch (Exception e){
                 e.printStackTrace();
-            }
-            catch (ClassNotFoundException classNotFoundException) {
-                System.out.println("Unknown object type received.");
             }
             finally{
                 closeConnection();
             }
-        }).start();
+        }
     }
 
-    public void sendObjects(Object object){
-        new Thread(() -> {
+    private class WriteThread extends Thread{
+        @Override
+        public void run() {
             try {
-                // Send String OBJECT to client.
-                oos.writeObject(object);
-                // Flush to ensure that data is pushed through stream to client.
-                oos.flush();
-            } catch (IOException ioException) {
-                System.out.println("Error writing object. " + ioException.getMessage());
-                ioException.printStackTrace();
+                while(!isInterrupted()) {
+                    Object object = objectsOut.take();
+
+                    oos.writeObject(object);
+                    oos.flush();
+
+                    System.out.println("CLIENT>>> " + ((HashMap<String, Object>) object).get("player"));
+                }
+            } catch (Exception e) {
+                System.out.println("Error writing object. " + e.getMessage());
+                e.printStackTrace();
             }
-        }).start();
+            finally {
+                writeThread = null;
+            }
+        }
     }
 
     private void closeConnection(){
@@ -86,6 +102,8 @@ public class Client {
             oos.close();
             ois.close();
             connection.close();
+
+            writeThread.interrupt();
         } catch (IOException e) {
             e.printStackTrace();
         }

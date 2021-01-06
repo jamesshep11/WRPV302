@@ -10,6 +10,11 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+
+import com.example.segrada.PubSubBroker.Broker;
+
+import java.lang.reflect.Field;
 
 
 /**
@@ -18,17 +23,14 @@ import android.view.ViewGroup;
  * create an instance of this fragment.
  */
 public class GamePlayFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String Active = "Active";
-    private static final String GRID = "Grid";
-    private static final String COLOR = "Color";
-
     // TODO: Rename and change types of parameters
+    private Broker broker;
+
+    private boolean active;
     private Grid grid;
     private GridView gridView;
     private String color;
-    private boolean active;
+    private int player;
 
 
     public GamePlayFragment() {
@@ -44,26 +46,22 @@ public class GamePlayFragment extends Fragment {
      * @return A new instance of fragment GamePlayFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static GamePlayFragment newInstance(boolean active, Grid grid, String color) {
+    public static GamePlayFragment newInstance(boolean active, Grid grid, String color, int player) {
         GamePlayFragment fragment = new GamePlayFragment();
-        Bundle args = new Bundle();
-        args.putBoolean(Active, active);
-        args.putSerializable(GRID, grid);
-        args.putString(COLOR, color);
-        fragment.setArguments(args);
+        fragment.broker = Broker.getInstance();
+
+        fragment.active = active;
+        fragment.grid = grid;
+        fragment.color = color;
+        fragment.player = player;
+
         return fragment;
     }
-
-    private void init(){}
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            active = getArguments().getBoolean(Active);
-            grid = (Grid)getArguments().getSerializable(GRID);
-            color = getArguments().getString(COLOR);
-        }
+
         gridView = new GridView(this);
     }
 
@@ -78,8 +76,27 @@ public class GamePlayFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        TextView txtPlayer = getView().findViewById(R.id.txtPlayer);
+        txtPlayer.setText(getString(R.string.Player, player));
+        int colorResId;
+        if (active)
+            colorResId = getResId(color, R.color.class);
+        else
+            colorResId = getResId("white", R.color.class);
+        txtPlayer.setBackgroundColor(getResources().getColor(colorResId));
+
         gridView.connectToUI();
         gridView.loadGrid(grid);
+    }
+
+    private int getResId(String rec, Class<?> aClass) {
+        try {
+            Field field = aClass.getDeclaredField(rec);
+            return field.getInt(field);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return -1;
+        }
     }
 
     public boolean isActive(){

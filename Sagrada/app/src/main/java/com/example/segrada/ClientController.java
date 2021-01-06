@@ -1,5 +1,7 @@
 package com.example.segrada;
 
+import android.util.Log;
+
 import com.example.segrada.PubSubBroker.Broker;
 
 import java.io.IOException;
@@ -8,92 +10,109 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
-public class ClientController extends Thread {
-    private String serverAddress;
+public class ClientController {
+    // Communication variables
     private Socket conn = null;
     private ObjectOutputStream oos = null;
     private ObjectInputStream ois = null;
+
+    private ReadThread readThread;
+    private WriteThread writeThread;
+
     private Broker broker;
-    private boolean running;
+
+    private BlockingQueue<Object> objectsOut = new LinkedBlockingQueue<>();
 
     public ClientController(String serverAddress) {
-        super(serverAddress);
-        this.serverAddress = serverAddress;
+        connectToServer(serverAddress);
         broker = Broker.getInstance();
-        broker.subscribe("CloseConnection", ((publisher, topic, params) -> {
-            params.put("topic", "EndGame");
-            sendObject(params);
-            running = false;
-        }));
-        broker.subscribe("EndGame", ((publisher, topic, params) -> running = false));
-
-        running = false;
     }
 
-    // Send an object to the server.
-    private void sendObject(Map<String, Object> message) {
-        new Thread(() -> {
+    private void connectToServer(String serverAddress){
+        new Thread(()->{
             try {
-                oos.writeObject(message);
+                // Connect to server
+                conn = new Socket(serverAddress, 500);
+                Log.i("Client>>> ", "Connecting to: " + conn.getInetAddress().getHostName());
+
+                // Get IO streams
+                ois = new ObjectInputStream(conn.getInputStream());
+                oos = new ObjectOutputStream(conn.getOutputStream());
                 oos.flush();
-                System.out.println("CLIENT>>> " + message.get("topic"));
-            } catch (IOException ioException) {
-            System.out.println("ERROR: Error writing object");
-        }
+
+                // Start read/write threads
+                readThread = new ReadThread();
+                readThread.start();
+                writeThread = new WriteThread();
+                writeThread.start();
+
+                Log.i("Client>>> ", "Got I/O streams");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }).start();
     }
 
-    // Read an object from the server
-    private void readObject() throws IOException, ClassNotFoundException {
-        HashMap<String, Object> message = (HashMap<String, Object>) ois.readObject();
-        broker.publish(this, (String) message.get("topic"), message);
-        System.out.println("SERVER>>> " + message.get("topic"));
-    }
-
-    @Override
-    public void run() {
+    public void sendObject(Object object) {
         try {
-            // Connect to server.
-            conn = new Socket(serverAddress, 500);
-            System.out.println("Connecting to: " + conn.getInetAddress().getHostName());
-
-            getStreams();
-
-            running = true;
-            // Read messages from server until told to terminate.
-            while (running)
-                readObject();
-        }
-        catch (Exception e) {
-            System.out.println("ERROR: " + e.getMessage());
+            objectsOut.put(object);
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        finally {
-            // Close connection.
-            close();
+    }
 
-            System.out.println("Disconnected...");
+    // Read objects from the server
+    private class ReadThread extends Thread{
+        @Override
+        public void run() {
+            try {
+                HashMap<String, Object> message;
+                do {
+                    // Read and broadcast message.
+                    message = (HashMap<String, Object>) ois.readObject();
+                    broker.publish(this, (String) message.get("topic"), message);
+
+                    Log.i("SERVER>>> ", (String)message.get("topic"));
+                } while (!message.get("topic").equals("CloseConnection"));
+            } catch (Exception e){
+                e.printStackTrace();
+            } finally {
+                closeConnection();
+            }
         }
     }
 
-    // Get and initialise streams.
-    private void getStreams() throws IOException {
-        ois = new ObjectInputStream(conn.getInputStream());
+    // Send objects to the server
+    private class WriteThread extends Thread{
+        @Override
+        public void run() {
+            try {
+                while(!isInterrupted()) {
+                    Object object = objectsOut.take();
 
-        oos = new ObjectOutputStream(conn.getOutputStream());
-        oos.flush();
+                    oos.writeObject(object);
+                    oos.flush();
 
-        System.out.println("Got I/O streams");
+                    Log.i("Client>>> ", (String)((HashMap<String, Object>)object).get("topic"));
+                }
+            } catch (Exception e) {
+                System.out.println("ERROR: Error writing object");
+            }
+        }
     }
 
     // Close streams and connection
-    private void close() {
+    private void closeConnection() {
         try {
             oos.close();
             ois.close();
             conn.close();
 
+            readThread = null;
+            if (writeThread != null) writeThread.interrupt();
         } catch (Exception e) {
             System.out.println("ERROR: " + e.getMessage());
         }

@@ -6,17 +6,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Main {
-    static HashMap<String, Color> colors = new HashMap<String, Color>(){{
-        put("purple", new Color(0x9C27B0)); put("red", new Color(0xF44336)); put("yellow", new Color(0xFFEB3B));
-        put("green", new Color(0x4CAF50)); put("blue", new Color(0x03A9F4)); put("grey", new Color(0x333333)); put("White", new Color(0xFFFFFF));
-    }};
     private static ArrayList<Grid> grids;
 
-    public static void main(String args[]) {
+    public static void main(String args[]) throws Exception {
         grids = new ArrayList<>();
         buildGrids();
 
-        new Server().run();
+        new Server();
     }
 
     public static ArrayList<Grid> getGrids(){
