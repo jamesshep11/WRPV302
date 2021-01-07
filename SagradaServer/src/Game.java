@@ -1,29 +1,47 @@
 import PubSubBroker.Broker;
-import com.example.segrada.Grid;
+import com.example.segrada.Die.Die;
+import com.example.segrada.Grids.Grid;
 
 import java.util.*;
 
 public class Game {
-    private Broker serverBroker;
-    private Broker broker;
+    private final Broker serverBroker;
+    private final Broker broker;
 
     private final String[] colors = {"blue", "yellow", "purple", "red", "green"};
-    private ArrayList<Client> clients;
-    private ArrayList<Grid> grids;
+    private final ArrayList<Client> clients;
+    private final ArrayList<Grid> grids = Main.getGrids();
+    private Die bag = fillBag();
+    private int roundCount = 0;
 
     public Game(ArrayList<Client> clients, Broker broker, Broker serverBroker) {
         this.clients = clients;
         this.serverBroker = serverBroker;
         this.broker = broker;
-        grids = Main.getGrids();
 
-        broker.subscribe("EndGame", (publisher, topic, params) -> endGame());
+        subToBroker();
 
         // Randomly allocate grids and colors
         Collections.shuffle(grids);
         Collections.shuffle(Arrays.asList(colors));
+        bag.shuffle();
 
         startGame();
+    }
+
+    private void subToBroker(){
+        broker.subscribe("GameStarted", (publisher, topic, params) -> nextRound());
+
+        broker.subscribe("EndGame", (publisher, topic, params) -> endGame());
+    }
+
+    private Die fillBag(){
+        Die die = new Die();
+        for (String color : colors)
+            for (int i = 1; i <= 18; i++)
+                die.add(color);
+
+        return die;
     }
 
     private void startGame(){
@@ -39,9 +57,27 @@ public class Game {
         params.put("color4", colors[3]);
 
         for(int i = 0; i < clients.size(); i++){
-            params.put("player", i+1);
+            params.put("player", i);
             clients.get(i).sendObject(params);
         }
+    }
+
+    private void nextRound(){
+        // Initialize a new round
+        Round round = Round.getInstance();
+        round.nextRound(bag);
+
+        // Notify clients to start round
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("topic", "StartRound");
+        params.put("draftPool", round.getDraftPool());
+        sendToAll(params);
+
+        roundCount++;
+    }
+
+    private void nextTurn(){
+
     }
 
     private void sendToAll(Map<String, Object> params){

@@ -9,8 +9,6 @@ import android.widget.EditText;
 
 import com.example.segrada.PubSubBroker.Broker;
 
-import java.util.Map;
-
 public class MainActivity extends AppCompatActivity {
 
     private ClientController server;
@@ -18,7 +16,6 @@ public class MainActivity extends AppCompatActivity {
     private String serverAddress = "";
 
     public static String PACKAGE_NAME;
-    private Map<String, Object> initParams;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,28 +32,25 @@ public class MainActivity extends AppCompatActivity {
                 .setView(input)
                 .setPositiveButton("OK", ((dialog, which) -> {
                     serverAddress = input.getText().toString();
-                    server = new ClientController(serverAddress);
+                    server = ClientController.getInstance(serverAddress);
                 }))
                 .show();
         //endregion
 
         // Set up PubSubBroker
         broker = Broker.getInstance();
-        broker.subscribe("StartGame", (publisher, topic, params) -> {
-            initParams = params;
-            initParams.put("server", server);
-            startGame();
-        });
-        broker.subscribe("GameStarted", ((publisher, topic, params) -> init(initParams)));
+        subToBroker();
     }
 
-    private void startGame(){
+    private void subToBroker(){
+        broker.subscribe("StartGame", (publisher, topic, params) -> {
+            openGamePlayActivity();
+            finish();
+        });
+    }
+
+    private void openGamePlayActivity(){
         Intent intent = new Intent(this, GamePlayActivity.class);
         startActivity(intent);
-    }
-
-    private void init(Map<String, Object> params){
-        broker.publish(this, "Init", params);
-        finish();
     }
 }

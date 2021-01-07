@@ -12,6 +12,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.example.segrada.Grids.Grid;
+import com.example.segrada.Grids.GridView;
 import com.example.segrada.PubSubBroker.Broker;
 
 import java.lang.reflect.Field;
@@ -23,14 +25,14 @@ import java.lang.reflect.Field;
  * create an instance of this fragment.
  */
 public class GamePlayFragment extends Fragment {
-    // TODO: Rename and change types of parameters
     private Broker broker;
+    private Game game;
 
     private boolean active;
     private Grid grid;
     private GridView gridView;
     private String color;
-    private int player;
+    private int fragNum;
 
 
     public GamePlayFragment() {
@@ -41,19 +43,19 @@ public class GamePlayFragment extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
+     * @param fragNum the fragment number. Corresponds with the player number that this fragment represents.
      * @return A new instance of fragment GamePlayFragment.
      */
-    // TODO: Rename and change types and number of parameters
-    public static GamePlayFragment newInstance(boolean active, Grid grid, String color, int player) {
+    public static GamePlayFragment newInstance(int fragNum) {
         GamePlayFragment fragment = new GamePlayFragment();
+        fragment.game = Game.getInstance(null);
         fragment.broker = Broker.getInstance();
+        fragment.subToBroker();
 
-        fragment.active = active;
-        fragment.grid = grid;
-        fragment.color = color;
-        fragment.player = player;
+        fragment.fragNum = fragNum;
+        fragment.grid = fragment.game.getGrids().get(fragNum);
+        fragment.color = fragment.game.getColors().get(fragNum);
+        fragment.active = false;
 
         return fragment;
     }
@@ -77,9 +79,9 @@ public class GamePlayFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         TextView txtPlayer = getView().findViewById(R.id.txtPlayer);
-        txtPlayer.setText(getString(R.string.Player, player));
+        txtPlayer.setText(getString(R.string.Player, fragNum));
         int colorResId;
-        if (active)
+        if (game.getPlayerNum() == fragNum)
             colorResId = getResId(color, R.color.class);
         else
             colorResId = getResId("white", R.color.class);
@@ -99,7 +101,11 @@ public class GamePlayFragment extends Fragment {
         }
     }
 
-    public boolean isActive(){
-        return active;
+    private void subToBroker(){
+
+    }
+
+    public int getFragNum(){
+        return fragNum;
     }
 }

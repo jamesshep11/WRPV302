@@ -51,6 +51,10 @@ public class Broker {
         }
     }
 
+    public void unsubscribe(String topic) {
+        subscribers.remove(topic);
+    }
+
     public void publish(Object publisher, String topic, Map<String, Object> params) {
         Set<Subscriber> subscriberSet = subscribers.get(topic);
 

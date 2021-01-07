@@ -1,9 +1,7 @@
-import com.example.segrada.Grid;
-import com.example.segrada.GridBlock;
+import com.example.segrada.Grids.Grid;
+import com.example.segrada.Grids.GridBlock;
 
-import java.awt.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class Main {
     private static ArrayList<Grid> grids;

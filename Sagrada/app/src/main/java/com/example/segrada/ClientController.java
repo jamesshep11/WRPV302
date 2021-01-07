@@ -14,6 +14,8 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class ClientController {
+    static private ClientController instance;
+
     // Communication variables
     private Socket conn = null;
     private ObjectOutputStream oos = null;
@@ -26,9 +28,16 @@ public class ClientController {
 
     private BlockingQueue<Object> objectsOut = new LinkedBlockingQueue<>();
 
-    public ClientController(String serverAddress) {
+    private ClientController(String serverAddress) {
         connectToServer(serverAddress);
         broker = Broker.getInstance();
+    }
+
+    static public ClientController getInstance(String serverAddress){
+        if (instance == null)
+            instance = new ClientController(serverAddress);
+
+        return instance;
     }
 
     private void connectToServer(String serverAddress){
