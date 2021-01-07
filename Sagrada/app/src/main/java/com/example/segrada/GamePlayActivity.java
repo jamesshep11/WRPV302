@@ -51,7 +51,7 @@ public class GamePlayActivity extends AppCompatActivity {
     }
 
     private void loadDieToView(){
-        
+
     }
 
     // Add fragment to container view

@@ -35,9 +35,9 @@ public class Die implements Serializable {
 
     public void sort() {
         Collections.sort(die, (dice1, dice2) -> {
-            int val = dice1.color.compareTo(dice2.color);
+            int val = dice1.getColor().compareTo(dice2.getColor());
             if (val == 0)
-                val = dice1.value - dice2.value;
+                val = dice1.getValue() - dice2.getValue();
 
             return val;
         });
@@ -48,11 +48,40 @@ public class Die implements Serializable {
             dice.roll();
     }
 
+    public Dice get(int pos) {
+        return die.get(pos);
+    }
+
     public void clear(){
         die.clear();
     }
 
-    public Dice get(int pos) {
-        return die.get(pos);
+    public void setDiceViewVarialbes(int dicePos, float x, float y, float dx, float dy){
+        Dice dice = die.get(dicePos);
+        dice.setViewVariables(x, y, dx, dy);
+    }
+
+    public void setRandomDiceViewVariables(){
+        for (Dice dice : die)
+            dice.setRandomViewVariable();
+    }
+
+    public void moveDie(){
+        for (Dice dice : die)
+            dice.move();
+    }
+
+    public boolean areRolling(){
+        boolean rolling = false;
+        for (Dice dice : die)
+            if (dice.isRolling())
+                rolling = true;
+
+        return rolling;
+    }
+
+    public void setRolling(boolean rolling){
+        for (Dice dice : die)
+            dice.setRolling(rolling);
     }
 }

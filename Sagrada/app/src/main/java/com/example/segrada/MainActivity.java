@@ -4,6 +4,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.widget.EditText;
 
@@ -16,6 +17,8 @@ public class MainActivity extends AppCompatActivity {
     private String serverAddress = "";
 
     public static String PACKAGE_NAME;
+    public static int SCREEN_WIDTH;
+    public static int SCREEN_HEIGHT;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,6 +26,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         PACKAGE_NAME = getApplicationContext().getPackageName();
+        SCREEN_WIDTH = getResources().getDisplayMetrics().widthPixels;
+        SCREEN_HEIGHT = getResources().getDisplayMetrics().heightPixels;
 
         //region Connect to Server
         EditText input = new EditText(this);
