@@ -12,6 +12,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.example.segrada.Die.Dice;
+import com.example.segrada.Die.DiceView;
+import com.example.segrada.Die.Die;
 import com.example.segrada.Grids.Grid;
 import com.example.segrada.Grids.GridView;
 import com.example.segrada.PubSubBroker.Broker;
@@ -50,7 +53,6 @@ public class GamePlayFragment extends Fragment {
         GamePlayFragment fragment = new GamePlayFragment();
         fragment.game = Game.getInstance(null);
         fragment.broker = Broker.getInstance();
-        fragment.subToBroker();
 
         fragment.fragNum = fragNum;
         fragment.grid = fragment.game.getGrids().get(fragNum);
@@ -78,17 +80,36 @@ public class GamePlayFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        subToBroker();
+
+        renderDraftPool();
+
+        //region Handle Player# header
         TextView txtPlayer = getView().findViewById(R.id.txtPlayer);
-        txtPlayer.setText(getString(R.string.Player, fragNum));
+        txtPlayer.setText(getString(R.string.Player, fragNum+1));
         int colorResId;
         if (game.getPlayerNum() == fragNum)
             colorResId = getResId(color, R.color.class);
         else
             colorResId = getResId("white", R.color.class);
         txtPlayer.setBackgroundColor(getResources().getColor(colorResId));
+        //endregion
 
         gridView.connectToUI();
         gridView.loadGrid(grid);
+    }
+
+    private void subToBroker(){
+
+    }
+
+    private void renderDraftPool(){
+        Die draftPool = game.getDraftPool();
+        for (int i = 0; i < draftPool.count(); i++){
+            int diceId = getResId("diceView"+(i+1), R.id.class);
+            DiceView dice = getView().findViewById(diceId);
+            dice.setDice(draftPool.get(i));
+        }
     }
 
     private int getResId(String rec, Class<?> aClass) {
@@ -99,10 +120,6 @@ public class GamePlayFragment extends Fragment {
             e.printStackTrace();
             return -1;
         }
-    }
-
-    private void subToBroker(){
-
     }
 
     public int getFragNum(){

@@ -39,7 +39,7 @@ public class Server {
 			gameBroker.subscribe("CloseConnection", removeClient);
 
 			// Wait for 4 clients to join
-			while (clients.size() < 2) {
+			while (clients.size() < Game.numPlayers) {
 				Socket connection = server.accept();
 				System.out.printf("Connection request received: %s\n", connection.getInetAddress().getHostAddress());
 

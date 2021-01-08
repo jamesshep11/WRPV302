@@ -8,6 +8,7 @@ public class Game {
     private final Broker serverBroker;
     private final Broker broker;
 
+    static int numPlayers = 1;
     private final String[] colors = {"blue", "yellow", "purple", "red", "green"};
     private final ArrayList<Client> clients;
     private final ArrayList<Grid> grids = Main.getGrids();
@@ -29,8 +30,13 @@ public class Game {
         startGame();
     }
 
+    private int numGamesStarted = 0;
     private void subToBroker(){
-        broker.subscribe("GameStarted", (publisher, topic, params) -> nextRound());
+        broker.subscribe("GameStarted", (publisher, topic, params) -> {
+            numGamesStarted++;
+            if (numGamesStarted == numPlayers)
+                nextRound();
+        });
 
         broker.subscribe("EndGame", (publisher, topic, params) -> endGame());
     }

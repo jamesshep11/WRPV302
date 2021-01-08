@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
+import com.example.segrada.Die.Dice;
+import com.example.segrada.Die.DiceView;
 import com.example.segrada.Die.Die;
 import com.example.segrada.PubSubBroker.Broker;
 import com.example.segrada.PubSubBroker.Subscriber;
@@ -29,9 +31,12 @@ public class GamePlayActivity extends AppCompatActivity {
         setContentView(R.layout.activity_game_play);
 
         subToBroker();
-        curFrag = frags.get(game.getPlayerNum()-1);
+        curFrag = frags.get(game.getPlayerNum());
         loadFrag(curFrag);
-        server.sendObject(new HashMap<String, Object>(){{put("topic", "GameStarted");}});
+
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("topic", "GameStarted");
+        server.sendObject(params);
     }
 
     private void subToBroker(){

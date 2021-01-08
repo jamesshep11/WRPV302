@@ -49,7 +49,7 @@ public class Client {
     public void sendObject(Object object){
         try {
             objectsOut.put(object);
-            System.out.println(((HashMap<String, Object>)objectsOut.peek()).get("player"));
+            //System.out.println(((HashMap<String, Object>)objectsOut.peek()).get("player"));
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -59,12 +59,13 @@ public class Client {
         @Override
         public void run() {
             try {
-                HashMap<String, Object> message;
+                HashMap<String, Object> object;
                 do {
                     // Read message from Client
-                    message = (HashMap<String, Object>)ois.readObject();
-                    broker.publish(this, (String)message.get("topic"), message);
-                } while (!(message.get("topic")).equals("CloseConnection"));
+                    object = (HashMap<String, Object>)ois.readObject();
+                    broker.publish(this, (String)object.get("topic"), object);
+                    System.out.println("CLIENT>>> " + object.get("topic"));
+                } while (!(object.get("topic")).equals("CloseConnection"));
             } catch (Exception e){
                 e.printStackTrace();
             }
@@ -84,7 +85,7 @@ public class Client {
                     oos.writeObject(object);
                     oos.flush();
 
-                    System.out.println("CLIENT>>> " + ((HashMap<String, Object>) object).get("player"));
+                    System.out.println("SERVER>>> " + ((HashMap<String, Object>) object).get("topic"));
                 }
             } catch (Exception e) {
                 System.out.println("Error writing object. " + e.getMessage());

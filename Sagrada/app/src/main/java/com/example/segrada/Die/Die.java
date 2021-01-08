@@ -35,7 +35,7 @@ public class Die implements Serializable {
 
     public void sort() {
         Collections.sort(die, (dice1, dice2) -> {
-            int val = dice1.getColor().compareTo(dice2.getColor());
+            int val = dice2.getColor().compareTo(dice1.getColor());
             if (val == 0)
                 val = dice1.getValue() - dice2.getValue();
 

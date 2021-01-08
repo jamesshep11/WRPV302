@@ -29,6 +29,10 @@ public class MainActivity extends AppCompatActivity {
         SCREEN_WIDTH = getResources().getDisplayMetrics().widthPixels;
         SCREEN_HEIGHT = getResources().getDisplayMetrics().heightPixels;
 
+        // Set up PubSubBroker
+        broker = Broker.getInstance();
+        subToBroker();
+
         //region Connect to Server
         EditText input = new EditText(this);
         new AlertDialog.Builder(this)
@@ -41,14 +45,11 @@ public class MainActivity extends AppCompatActivity {
                 }))
                 .show();
         //endregion
-
-        // Set up PubSubBroker
-        broker = Broker.getInstance();
-        subToBroker();
     }
 
     private void subToBroker(){
         broker.subscribe("StartGame", (publisher, topic, params) -> {
+            Game.getInstance(params);
             openGamePlayActivity();
             finish();
         });

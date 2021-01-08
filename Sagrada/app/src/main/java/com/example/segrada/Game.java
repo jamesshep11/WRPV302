@@ -12,7 +12,7 @@ public class Game {
 
     private ClientController server = ClientController.getInstance(null);
 
-    private ArrayList<GamePlayFragment> frags = new ArrayList<>();
+    static private ArrayList<GamePlayFragment> frags = new ArrayList<>();
     private ArrayList<String> colors = new ArrayList<>();
     private ArrayList<Grid> grids = new ArrayList<>();
     private Die draftPool;
@@ -33,21 +33,18 @@ public class Game {
 
         // Extract this player's playerNum from params
         playerNum = (int)params.get("player");
-
-        // Initialize the fragments
-        initFrags();
     }
 
     static public Game getInstance(Map<String, Object> params) {
-        if (instance == null)
+        if (instance == null) {
             instance = new Game(params);
+            initFrags();
+        }
 
         return instance;
     }
 
-
-
-    private void initFrags(){
+    static private void initFrags(){
         // Initialize the fragments for each player
         frags.add(GamePlayFragment.newInstance(0));
         frags.add(GamePlayFragment.newInstance(1));
