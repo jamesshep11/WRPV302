@@ -8,6 +8,7 @@ public class GridBlock implements Serializable {
     private String color;
     private int value;
     private boolean set;
+    private boolean valid = false;
 
     public GridBlock (){
         this.color = "white";
@@ -61,5 +62,14 @@ public class GridBlock implements Serializable {
     public void setSet(boolean set) {
         this.set = set;
     }
+
+    public boolean isValid(){
+        return valid;
+    }
+
+    public void setValid(boolean valid) {
+        this.valid = valid;
+    }
+
     //endregion
 }

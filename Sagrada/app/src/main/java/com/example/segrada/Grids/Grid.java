@@ -15,13 +15,15 @@ public class Grid implements Serializable {
         gridBlocks[x][y] = block;
     }
 
+    public void invalidateAll(){
+        for (int x = 0; x < gridBlocks.length; x++)
+            for (int y = 0; y < gridBlocks[x].length; y++)
+                gridBlocks[x][y].setValid(false);
+    }
+
     public GridBlock getAt(int x, int y){
         return gridBlocks[x][y];
     }
-
-    /*private boolean isValid(GridBlock block){
-
-    }*/
 
     public GridBlock[][] getGridBlocks() {
         return gridBlocks;

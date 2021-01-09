@@ -6,6 +6,7 @@ import com.example.segrada.GamePlayFragment;
 import com.example.segrada.R;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 
 public class GridView {
 
@@ -58,7 +59,16 @@ public class GridView {
                 button.setBackground(context.getResources().getDrawable(dieVals[block.getValue()]));
                 int colorResId = getResId(block.getColor(), R.color.class);
                 button.setBackgroundTintList(context.getResources().getColorStateList(colorResId));
+
+                button.setEnabled(block.isValid());
             }
+        this.grid = grid;
+    }
+
+    public void setClickable(boolean clickable){
+        for (Button[] buttonss : buttons)
+            for (Button button : buttonss)
+                button.setEnabled(clickable);
     }
 
     private int getResId(String rec, Class<?> aClass) {

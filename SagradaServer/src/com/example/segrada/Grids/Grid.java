@@ -1,6 +1,9 @@
 package com.example.segrada.Grids;
 
+import com.example.segrada.Die.Dice;
+
 import java.io.Serializable;
+import java.util.HashMap;
 
 public class Grid implements Serializable {
     private static final long serialVersionUID = 999L;
@@ -19,9 +22,13 @@ public class Grid implements Serializable {
         return gridBlocks[x][y];
     }
 
-    /*private boolean isValid(com.example.segrada.Grids.GridBlock block){
+    public Grid findValid(Dice dice){
+        for (int x = 0; x < gridBlocks.length; x++)
+            for (int y = 0; y < gridBlocks[x].length; y++)
+                gridBlocks[x][y].validate(dice);
 
-    }*/
+        return this;
+    }
 
     public GridBlock[][] getGridBlocks() {
         return gridBlocks;

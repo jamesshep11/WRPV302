@@ -12,14 +12,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.example.segrada.Die.Dice;
 import com.example.segrada.Die.DiceView;
-import com.example.segrada.Die.Die;
 import com.example.segrada.Grids.Grid;
+import com.example.segrada.Grids.GridBlock;
 import com.example.segrada.Grids.GridView;
 import com.example.segrada.PubSubBroker.Broker;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 
 
 /**
@@ -31,11 +31,12 @@ public class GamePlayFragment extends Fragment {
     private Broker broker;
     private Game game;
 
+    private int fragNum;
     private boolean active;
     private Grid grid;
     private GridView gridView;
+    private int[] diceViewIDs = {R.id.diceView1, R.id.diceView2, R.id.diceView3, R.id.diceView4, R.id.diceView5, R.id.diceView6, R.id.diceView7, R.id.diceView8, R.id.diceView9};
     private String color;
-    private int fragNum;
 
 
     public GamePlayFragment() {
@@ -56,7 +57,10 @@ public class GamePlayFragment extends Fragment {
 
         fragment.fragNum = fragNum;
         fragment.grid = fragment.game.getGrids().get(fragNum);
-        fragment.color = fragment.game.getColors().get(fragNum);
+        if (fragment.game.getThisPLayer() == fragNum)
+            fragment.color = fragment.game.getColor();
+        else
+            fragment.color = "white";
         fragment.active = false;
 
         return fragment;
@@ -82,33 +86,34 @@ public class GamePlayFragment extends Fragment {
 
         subToBroker();
 
-        renderDraftPool();
-
         //region Handle Player# header
         TextView txtPlayer = getView().findViewById(R.id.txtPlayer);
         txtPlayer.setText(getString(R.string.Player, fragNum+1));
-        int colorResId;
-        if (game.getPlayerNum() == fragNum)
-            colorResId = getResId(color, R.color.class);
-        else
-            colorResId = getResId("white", R.color.class);
+        int colorResId = getResId(color, R.color.class);
         txtPlayer.setBackgroundColor(getResources().getColor(colorResId));
         //endregion
 
         gridView.connectToUI();
         gridView.loadGrid(grid);
+
+        renderDraftPool();
+
+        setClickable(active);
     }
 
     private void subToBroker(){
 
     }
 
+    public void setClickable(boolean clickable){
+        for (int id : diceViewIDs)
+            getView().findViewById(id).setEnabled(clickable);
+    }
+
     private void renderDraftPool(){
-        Die draftPool = game.getDraftPool();
-        for (int i = 0; i < draftPool.count(); i++){
-            int diceId = getResId("diceView"+(i+1), R.id.class);
-            DiceView dice = getView().findViewById(diceId);
-            dice.setDice(draftPool.get(i));
+        for (int i = 0; i < diceViewIDs.length; i++){
+            DiceView dice = getView().findViewById(diceViewIDs[i]);
+            dice.setDice(game.getDraftPool().get(i));
         }
     }
 
@@ -124,5 +129,17 @@ public class GamePlayFragment extends Fragment {
 
     public int getFragNum(){
         return fragNum;
+    }
+
+    public GridView getGridView() {
+        return gridView;
+    }
+
+    public void setGrid(Grid grid) {
+        this.grid = grid;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }

@@ -1,5 +1,7 @@
 package com.example.segrada.Grids;
 
+import com.example.segrada.Die.Dice;
+
 import java.io.Serializable;
 
 public class GridBlock implements Serializable {
@@ -8,6 +10,7 @@ public class GridBlock implements Serializable {
     private String color;
     private int value;
     private boolean set;
+    private boolean valid = false;
 
     public GridBlock (){
         this.color = "white";
@@ -35,6 +38,19 @@ public class GridBlock implements Serializable {
 
     public GridBlock clone(){
         return new GridBlock(this.color, this.value, this.set);
+    }
+
+    public void validate(Dice dice){
+        if (set)
+            valid = false;
+        else if (color.equals("white"))
+            valid = true;
+        else if (color.equals("grey") && value == dice.getValue())
+            valid = true;
+        else if (color.equals(dice.getColor()))
+            valid = true;
+        else
+            valid = false;
     }
 
     //region Getters & Setters

@@ -1,5 +1,6 @@
 package com.example.segrada;
 
+import com.example.segrada.Die.Dice;
 import com.example.segrada.Die.Die;
 import com.example.segrada.Grids.Grid;
 
@@ -13,10 +14,10 @@ public class Game {
     private ClientController server = ClientController.getInstance(null);
 
     static private ArrayList<GamePlayFragment> frags = new ArrayList<>();
-    private ArrayList<String> colors = new ArrayList<>();
+    private String color;
     private ArrayList<Grid> grids = new ArrayList<>();
     private Die draftPool;
-    private int playerNum;
+    private int thisPlayer;
 
     private Game(Map<String, Object> params) {
         // Extract the Grids from params
@@ -25,14 +26,11 @@ public class Game {
         grids.add((Grid)params.get("grid3"));
         grids.add((Grid)params.get("grid4"));
 
-        // Extract the colors from params
-        colors.add((String)params.get("color1"));
-        colors.add((String)params.get("color2"));
-        colors.add((String)params.get("color3"));
-        colors.add((String)params.get("color4"));
-
         // Extract this player's playerNum from params
-        playerNum = (int)params.get("player");
+        thisPlayer = (int)params.get("player");
+
+        // Extract the colors from params
+        color = (String)params.get("color"+(thisPlayer+1));
     }
 
     static public Game getInstance(Map<String, Object> params) {
@@ -61,12 +59,12 @@ public class Game {
         return grids;
     }
 
-    public ArrayList<String> getColors() {
-        return colors;
+    public String getColor() {
+        return color;
     }
 
-    public int getPlayerNum() {
-        return playerNum;
+    public int getThisPLayer() {
+        return thisPlayer;
     }
 
     public Die getDraftPool(){

@@ -1,20 +1,20 @@
 package com.example.segrada;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
-import com.example.segrada.Die.Dice;
 import com.example.segrada.Die.DiceView;
 import com.example.segrada.Die.Die;
+import com.example.segrada.Grids.Grid;
 import com.example.segrada.PubSubBroker.Broker;
-import com.example.segrada.PubSubBroker.Subscriber;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 
 public class GamePlayActivity extends AppCompatActivity {
 
@@ -31,7 +31,7 @@ public class GamePlayActivity extends AppCompatActivity {
         setContentView(R.layout.activity_game_play);
 
         subToBroker();
-        curFrag = frags.get(game.getPlayerNum());
+        curFrag = frags.get(game.getThisPLayer());
         loadFrag(curFrag);
 
         HashMap<String, Object> params = new HashMap<>();
@@ -42,14 +42,28 @@ public class GamePlayActivity extends AppCompatActivity {
     private void subToBroker(){
         broker.subscribe("StartRound", (publisher, topic, params) -> {
             Die draftPool = (Die)params.get("draftPool");
-            draftPool.sort();
             game.setDraftPool(draftPool);
 
-            rollDice();
+            showRollingAnimation();
+        });
+        broker.subscribe("StartTurn", (publisher, topic, params) -> {
+            int player = (int)params.get("player");
+            GamePlayFragment thisPlayersFrag = frags.get(game.getThisPLayer());
+            thisPlayersFrag.setActive(player == game.getThisPLayer());
+
+            //loadFrag(curFrag);
+            Log.i("Player Turn: ", Integer.toString(player));
+        });
+        broker.subscribe("ValidSlots", (publisher, topic, params) -> {
+            Grid validSlots = (Grid) params.get("validSlots");
+
+            GamePlayFragment frag = frags.get(game.getThisPLayer());
+            frag.setGrid(validSlots);
+            refreshFrag(frag);
         });
     }
 
-    private void rollDice(){
+    private void showRollingAnimation(){
         Intent intent = new Intent(this, RollDiceActivity.class);
         startActivity(intent);
         loadDieToView();
@@ -67,8 +81,17 @@ public class GamePlayActivity extends AppCompatActivity {
                 .commit();
     }
 
+    private void refreshFrag(GamePlayFragment frag){
+        getSupportFragmentManager()
+                .beginTransaction()
+                .detach(frag)
+                .attach(frag)
+                .commit();
+    }
+
     // Calc and display next frag
     public void nextFrag(View view){
+        frags.get(game.getThisPLayer()).getGridView().getGrid().invalidateAll();
         int pos = curFrag.getFragNum();   // pos of current frag in list
         // find pos of next frag
         switch (pos){
@@ -83,6 +106,7 @@ public class GamePlayActivity extends AppCompatActivity {
 
     // Calc and display prev frag
     public void prevFrag(View view){
+        frags.get(game.getThisPLayer()).getGridView().getGrid().invalidateAll();
         int pos = curFrag.getFragNum();   // pos of current frag in list
         // find pos of prev frag
         switch (pos){
@@ -93,5 +117,20 @@ public class GamePlayActivity extends AppCompatActivity {
 
         curFrag = frags.get(pos);
         loadFrag(curFrag);
+    }
+
+    public void onDiceSelected(View view){
+        DiceView diceView = (DiceView)view;
+        diceView.setBorder("blue");
+
+        new AlertDialog.Builder(this)
+                .setMessage(diceView.getDice().getColor() + " " + diceView.getDice().getValue() + " selected.")
+                .show();
+
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("topic", "GetValidSlots");
+        params.put("dice", diceView.getDice());
+        params.put("grid", curFrag.getGridView().getGrid());
+        server.sendObject(params);
     }
 }

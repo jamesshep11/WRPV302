@@ -9,10 +9,12 @@ import com.example.segrada.Die.DiceView;
 import com.example.segrada.Die.Die;
 import com.example.segrada.PubSubBroker.Broker;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class RollDiceActivity extends AppCompatActivity {
 
+    private ClientController server = ClientController.getInstance(null);
     private Game game = Game.getInstance(null);
     private Broker broker = Broker.getInstance();
     private Die die;
@@ -31,7 +33,12 @@ public class RollDiceActivity extends AppCompatActivity {
 
         new AlertDialog.Builder(this)
                 .setMessage("Imagine the dice were rolling.")
-                .setOnDismissListener((param)-> finish())
+                .setOnDismissListener((param)-> {
+                    HashMap<String, Object> params = new HashMap<>();
+                    params.put("topic", "RoundStarted");
+                    server.sendObject(params);
+                    finish();
+                })
                 .show();
     }
 }

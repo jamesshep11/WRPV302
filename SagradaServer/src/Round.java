@@ -1,30 +1,29 @@
 import com.example.segrada.Die.Die;
 
-import java.util.Random;
-
 public class Round {
     static private Round instance;
 
+    static private Turn turn;
     private Die draftPool;
-    private int nextPlayer;
+    private int turnCount;
 
     private Round(){
         draftPool = new Die();
-        nextPlayer = new Random().nextInt(4);
+        turnCount = 0;
     }
 
     static public Round getInstance(){
-        if (instance == null)
+        if (instance == null) {
             instance = new Round();
+            turn = Turn.getInstance();
+        }
 
         return instance;
     }
 
     public void nextRound(Die bag){
-        // Select the next player to start the round
-        if (nextPlayer == 3)
-            nextPlayer = -1;
-        nextPlayer++;
+        turnCount = 0;
+        turn.nextPlayer();
 
         // Pick die to make the draft pool
         draftPool.clear();
@@ -34,13 +33,28 @@ public class Round {
 
         // Roll the die
         draftPool.roll();
+
+        // Sort the die
+        draftPool.sort();
     }
 
     public Die getDraftPool(){
         return draftPool;
     }
 
-    public int getNextPlayer(){
-        return nextPlayer;
+    public void nextTurn(){
+        turnCount++;
+        if (turnCount < 5)
+            turn.nextPlayer();
+        else if (turnCount > 5)
+            turn.prevPlayer();
+    }
+
+    public int getPlayer(){
+        return turn.getPlayer();
+    }
+
+    public int getTurnCount() {
+        return turnCount;
     }
 }

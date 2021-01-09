@@ -1,6 +1,8 @@
 import PubSubBroker.Broker;
+import com.example.segrada.Die.Dice;
 import com.example.segrada.Die.Die;
 import com.example.segrada.Grids.Grid;
+import com.example.segrada.Grids.GridBlock;
 
 import java.util.*;
 
@@ -30,12 +32,24 @@ public class Game {
         startGame();
     }
 
-    private int numGamesStarted = 0;
+    private int numGamesStarted = 0, numRoundsStarted = 0;
     private void subToBroker(){
         broker.subscribe("GameStarted", (publisher, topic, params) -> {
             numGamesStarted++;
             if (numGamesStarted == numPlayers)
                 nextRound();
+        });
+        broker.subscribe("RoundStarted", (publisher, topic, params) -> {
+            numRoundsStarted++;
+            if (numRoundsStarted == numPlayers)
+                nextTurn();
+        });
+        broker.subscribe("GetValidSlots", (publisher, topic, params) -> {
+            Grid validSlots = getAvailableSlots(params);
+            HashMap<String, Object> newParams = new HashMap<>();
+            newParams.put("topic", "ValidSlots");
+            newParams.put("validSlots", validSlots);
+            clients.get(Round.getInstance().getPlayer()).sendObject(newParams);
         });
 
         broker.subscribe("EndGame", (publisher, topic, params) -> endGame());
@@ -83,7 +97,24 @@ public class Game {
     }
 
     private void nextTurn(){
+        Round round = Round.getInstance();
+        round.nextTurn();
+        if (round.getTurnCount() > 8){
+            nextRound();
+            return;
+        }
+        int player = round.getPlayer();
 
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("topic", "StartTurn");
+        params.put("player", player);
+        sendToAll(params);
+    }
+
+    private Grid getAvailableSlots(Map<String, Object> params){
+        Grid grid = (Grid) params.get("grid");
+        Dice dice = (Dice) params.get("dice");
+        return grid.findValid(dice);
     }
 
     private void sendToAll(Map<String, Object> params){
