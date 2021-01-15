@@ -1,7 +1,10 @@
 package com.example.segrada.Grids;
 
+import android.util.Log;
 import android.widget.Button;
 
+import com.example.segrada.Die.Dice;
+import com.example.segrada.Die.DiceView;
 import com.example.segrada.GamePlayFragment;
 import com.example.segrada.R;
 
@@ -12,14 +15,14 @@ public class GridView {
 
     private GamePlayFragment context;
     private Grid grid;
-    private Button[][] buttons;
+    private DiceView[][] buttons;
 
     private final int[] dieVals = {R.drawable.zero, R.drawable.one, R.drawable.two, R.drawable.three, R.drawable.four, R.drawable.five, R.drawable.six};
 
     public GridView(GamePlayFragment context) {
         this.context = context;
         grid = new Grid();
-        buttons = new Button[4][5];
+        buttons = new DiceView[4][5];
     }
 
     public void connectToUI(){
@@ -54,20 +57,34 @@ public class GridView {
         for (int x = 0; x <= 3; x++)
             for (int y = 0; y <= 4; y++){
                 GridBlock block = gridBlocks[x][y];
-                Button button = buttons[x][y];
+                DiceView diceView = buttons[x][y];
 
-                button.setBackground(context.getResources().getDrawable(dieVals[block.getValue()]));
+                diceView.setBackground(context.getResources().getDrawable(dieVals[block.getValue()]));
                 int colorResId = getResId(block.getColor(), R.color.class);
-                button.setBackgroundTintList(context.getResources().getColorStateList(colorResId));
+                diceView.setBackgroundTintList(context.getResources().getColorStateList(colorResId));
 
-                button.setEnabled(block.isValid());
+               diceView.setEnabled(block.isValid());
             }
         this.grid = grid;
     }
 
+    public void placeDiceView(DiceView button, Dice dice){
+
+        button.setBackground(context.getResources().getDrawable(dieVals[dice.getValue()]));
+        int colorResId = getResId(dice.getColor(), R.color.class);
+        button.setBackgroundTintList(context.getResources().getColorStateList(colorResId));
+
+        for (int x = 0; x < buttons.length; x++)
+            for (int y = 0; y < buttons[x].length; y++)
+                if (buttons[x][y].getId() == button.getId()) {
+                    grid.setBlock(grid.getAt(x, y), dice);
+                    break;
+                }
+    }
+
     public void setClickable(boolean clickable){
-        for (Button[] buttonss : buttons)
-            for (Button button : buttonss)
+        for (DiceView[] buttonss : buttons)
+            for (DiceView button : buttonss)
                 button.setEnabled(clickable);
     }
 

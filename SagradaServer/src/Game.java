@@ -15,12 +15,14 @@ public class Game {
     private final ArrayList<Client> clients;
     private final ArrayList<Grid> grids = Main.getGrids();
     private Die bag = fillBag();
+    private Round round;
     private int roundCount = 0;
 
     public Game(ArrayList<Client> clients, Broker broker, Broker serverBroker) {
         this.clients = clients;
         this.serverBroker = serverBroker;
         this.broker = broker;
+        this.round = new Round();
 
         subToBroker();
 
@@ -49,7 +51,7 @@ public class Game {
             HashMap<String, Object> newParams = new HashMap<>();
             newParams.put("topic", "ValidSlots");
             newParams.put("validSlots", validSlots);
-            clients.get(Round.getInstance().getPlayer()).sendObject(newParams);
+            clients.get(round.getPlayer()).sendObject(newParams);
         });
 
         broker.subscribe("EndGame", (publisher, topic, params) -> endGame());
@@ -84,7 +86,6 @@ public class Game {
 
     private void nextRound(){
         // Initialize a new round
-        Round round = Round.getInstance();
         round.nextRound(bag);
 
         // Notify clients to start round
@@ -97,7 +98,6 @@ public class Game {
     }
 
     private void nextTurn(){
-        Round round = Round.getInstance();
         round.nextTurn();
         if (round.getTurnCount() > 8){
             nextRound();
@@ -105,6 +105,7 @@ public class Game {
         }
         int player = round.getPlayer();
 
+        // Notify clients to start turn
         HashMap<String, Object> params = new HashMap<>();
         params.put("topic", "StartTurn");
         params.put("player", player);

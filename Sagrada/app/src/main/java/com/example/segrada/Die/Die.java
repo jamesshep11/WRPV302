@@ -21,8 +21,12 @@ public class Die implements Serializable {
         die.add(dice);
     }
 
-    public Dice remove(int pos) {
+    public Dice removeAt(int pos) {
         return die.remove(pos);
+    }
+
+    public boolean remove(Dice dice){
+        return die.remove(dice);
     }
 
     public int count(){

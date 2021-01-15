@@ -1,6 +1,6 @@
 package com.example.segrada;
 
-import com.example.segrada.Die.Dice;
+import com.example.segrada.Die.DiceView;
 import com.example.segrada.Die.Die;
 import com.example.segrada.Grids.Grid;
 
@@ -13,11 +13,11 @@ public class Game {
 
     private ClientController server = ClientController.getInstance(null);
 
-    static private ArrayList<GamePlayFragment> frags = new ArrayList<>();
     private String color;
     private ArrayList<Grid> grids = new ArrayList<>();
     private Die draftPool;
     private int thisPlayer;
+    private DiceView curDice = null;
 
     private Game(Map<String, Object> params) {
         // Extract the Grids from params
@@ -34,27 +34,13 @@ public class Game {
     }
 
     static public Game getInstance(Map<String, Object> params) {
-        if (instance == null) {
+        if (instance == null)
             instance = new Game(params);
-            initFrags();
-        }
 
         return instance;
     }
 
-    static private void initFrags(){
-        // Initialize the fragments for each player
-        frags.add(GamePlayFragment.newInstance(0));
-        frags.add(GamePlayFragment.newInstance(1));
-        frags.add(GamePlayFragment.newInstance(2));
-        frags.add(GamePlayFragment.newInstance(3));
-    }
-
     //region Getters & Setters
-    public ArrayList<GamePlayFragment> getFrags(){
-        return frags;
-    }
-
     public ArrayList<Grid> getGrids() {
         return grids;
     }
@@ -74,5 +60,14 @@ public class Game {
     public void setDraftPool(Die draftPool){
         this.draftPool = draftPool;
     }
+
+    public DiceView getCurDice() {
+        return curDice;
+    }
+
+    public void setCurDice(DiceView curDice) {
+        this.curDice = curDice;
+    }
+
     //endregion
 }

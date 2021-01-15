@@ -6,17 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".GamePlayFragment">
 
-    <Button
-        android:id="@+id/button21"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:backgroundTint="#D9000000"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/divider"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline3" />
-
-    <Button
+    <com.example.segrada.Die.DiceView
         android:id="@+id/button1"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -25,12 +15,13 @@
         android:layout_marginEnd="4dp"
         android:layout_marginBottom="4dp"
         android:backgroundTintMode="multiply"
+        android:onClick="onDicePlaced"
         app:layout_constraintBottom_toTopOf="@+id/button6"
         app:layout_constraintEnd_toStartOf="@+id/button2"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline3" />
 
-    <Button
+    <com.example.segrada.Die.DiceView
         android:id="@+id/button2"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -39,12 +30,13 @@
         android:layout_marginEnd="4dp"
         android:layout_marginBottom="4dp"
         android:backgroundTintMode="multiply"
+        android:onClick="onDicePlaced"
         app:layout_constraintBottom_toTopOf="@+id/button7"
         app:layout_constraintEnd_toStartOf="@+id/button3"
         app:layout_constraintStart_toEndOf="@+id/button1"
         app:layout_constraintTop_toTopOf="@+id/guideline3" />
 
-    <Button
+    <com.example.segrada.Die.DiceView
         android:id="@+id/button3"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -53,12 +45,13 @@
         android:layout_marginEnd="4dp"
         android:layout_marginBottom="4dp"
         android:backgroundTintMode="multiply"
+        android:onClick="onDicePlaced"
         app:layout_constraintBottom_toTopOf="@+id/button8"
         app:layout_constraintEnd_toStartOf="@+id/button4"
         app:layout_constraintStart_toEndOf="@+id/button2"
         app:layout_constraintTop_toTopOf="@+id/guideline3" />
 
-    <Button
+    <com.example.segrada.Die.DiceView
         android:id="@+id/button4"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -67,12 +60,13 @@
         android:layout_marginEnd="4dp"
         android:layout_marginBottom="4dp"
         android:backgroundTintMode="multiply"
+        android:onClick="onDicePlaced"
         app:layout_constraintBottom_toTopOf="@+id/button9"
         app:layout_constraintEnd_toStartOf="@+id/button5"
         app:layout_constraintStart_toEndOf="@+id/button3"
         app:layout_constraintTop_toTopOf="@+id/guideline3" />
 
-    <Button
+    <com.example.segrada.Die.DiceView
         android:id="@+id/button5"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -81,12 +75,13 @@
         android:layout_marginEnd="12dp"
         android:layout_marginBottom="4dp"
         android:backgroundTintMode="multiply"
+        android:onClick="onDicePlaced"
         app:layout_constraintBottom_toTopOf="@+id/button10"
         app:layout_constraintEnd_toStartOf="@+id/divider"
         app:layout_constraintStart_toEndOf="@+id/button4"
         app:layout_constraintTop_toTopOf="@+id/guideline3" />
 
-    <Button
+    <com.example.segrada.Die.DiceView
         android:id="@+id/button6"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -95,12 +90,13 @@
         android:layout_marginEnd="4dp"
         android:layout_marginBottom="4dp"
         android:backgroundTintMode="multiply"
+        android:onClick="onDicePlaced"
         app:layout_constraintBottom_toTopOf="@+id/button11"
         app:layout_constraintEnd_toStartOf="@+id/button7"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/button1" />
 
-    <Button
+    <com.example.segrada.Die.DiceView
         android:id="@+id/button7"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -109,12 +105,13 @@
         android:layout_marginEnd="4dp"
         android:layout_marginBottom="4dp"
         android:backgroundTintMode="multiply"
+        android:onClick="onDicePlaced"
         app:layout_constraintBottom_toTopOf="@+id/button12"
         app:layout_constraintEnd_toStartOf="@+id/button8"
         app:layout_constraintStart_toEndOf="@+id/button6"
         app:layout_constraintTop_toBottomOf="@+id/button2" />
 
-    <Button
+    <com.example.segrada.Die.DiceView
         android:id="@+id/button8"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -123,12 +120,13 @@
         android:layout_marginEnd="4dp"
         android:layout_marginBottom="4dp"
         android:backgroundTintMode="multiply"
+        android:onClick="onDicePlaced"
         app:layout_constraintBottom_toTopOf="@+id/button13"
         app:layout_constraintEnd_toStartOf="@+id/button9"
         app:layout_constraintStart_toEndOf="@+id/button7"
         app:layout_constraintTop_toBottomOf="@+id/button3" />
 
-    <Button
+    <com.example.segrada.Die.DiceView
         android:id="@+id/button9"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -137,12 +135,13 @@
         android:layout_marginEnd="4dp"
         android:layout_marginBottom="4dp"
         android:backgroundTintMode="multiply"
+        android:onClick="onDicePlaced"
         app:layout_constraintBottom_toTopOf="@+id/button14"
         app:layout_constraintEnd_toStartOf="@+id/button10"
         app:layout_constraintStart_toEndOf="@+id/button8"
         app:layout_constraintTop_toBottomOf="@+id/button4" />
 
-    <Button
+    <com.example.segrada.Die.DiceView
         android:id="@+id/button10"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -151,12 +150,13 @@
         android:layout_marginEnd="12dp"
         android:layout_marginBottom="4dp"
         android:backgroundTintMode="multiply"
+        android:onClick="onDicePlaced"
         app:layout_constraintBottom_toTopOf="@+id/button15"
         app:layout_constraintEnd_toStartOf="@+id/divider"
         app:layout_constraintStart_toEndOf="@+id/button9"
         app:layout_constraintTop_toBottomOf="@+id/button5" />
 
-    <Button
+    <com.example.segrada.Die.DiceView
         android:id="@+id/button11"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -165,12 +165,13 @@
         android:layout_marginEnd="4dp"
         android:layout_marginBottom="4dp"
         android:backgroundTintMode="multiply"
+        android:onClick="onDicePlaced"
         app:layout_constraintBottom_toTopOf="@+id/button16"
         app:layout_constraintEnd_toStartOf="@+id/button12"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/button6" />
 
-    <Button
+    <com.example.segrada.Die.DiceView
         android:id="@+id/button12"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -179,12 +180,13 @@
         android:layout_marginEnd="4dp"
         android:layout_marginBottom="4dp"
         android:backgroundTintMode="multiply"
+        android:onClick="onDicePlaced"
         app:layout_constraintBottom_toTopOf="@+id/button17"
         app:layout_constraintEnd_toStartOf="@+id/button13"
         app:layout_constraintStart_toEndOf="@+id/button11"
         app:layout_constraintTop_toBottomOf="@+id/button7" />
 
-    <Button
+    <com.example.segrada.Die.DiceView
         android:id="@+id/button13"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -193,12 +195,13 @@
         android:layout_marginEnd="4dp"
         android:layout_marginBottom="4dp"
         android:backgroundTintMode="multiply"
+        android:onClick="onDicePlaced"
         app:layout_constraintBottom_toTopOf="@+id/button18"
         app:layout_constraintEnd_toStartOf="@+id/button14"
         app:layout_constraintStart_toEndOf="@+id/button12"
         app:layout_constraintTop_toBottomOf="@+id/button8" />
 
-    <Button
+    <com.example.segrada.Die.DiceView
         android:id="@+id/button14"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -207,12 +210,13 @@
         android:layout_marginEnd="4dp"
         android:layout_marginBottom="4dp"
         android:backgroundTintMode="multiply"
+        android:onClick="onDicePlaced"
         app:layout_constraintBottom_toTopOf="@+id/button19"
         app:layout_constraintEnd_toStartOf="@+id/button15"
         app:layout_constraintStart_toEndOf="@+id/button13"
         app:layout_constraintTop_toBottomOf="@+id/button9" />
 
-    <Button
+    <com.example.segrada.Die.DiceView
         android:id="@+id/button15"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -221,12 +225,13 @@
         android:layout_marginEnd="12dp"
         android:layout_marginBottom="4dp"
         android:backgroundTintMode="multiply"
+        android:onClick="onDicePlaced"
         app:layout_constraintBottom_toTopOf="@+id/button20"
         app:layout_constraintEnd_toStartOf="@+id/divider"
         app:layout_constraintStart_toEndOf="@+id/button14"
         app:layout_constraintTop_toBottomOf="@+id/button10" />
 
-    <Button
+    <com.example.segrada.Die.DiceView
         android:id="@+id/button16"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -235,13 +240,14 @@
         android:layout_marginEnd="4dp"
         android:layout_marginBottom="12dp"
         android:backgroundTintMode="multiply"
+        android:onClick="onDicePlaced"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/button17"
         app:layout_constraintHorizontal_bias="0.6"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/button11" />
 
-    <Button
+    <com.example.segrada.Die.DiceView
         android:id="@+id/button17"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -250,12 +256,13 @@
         android:layout_marginEnd="4dp"
         android:layout_marginBottom="12dp"
         android:backgroundTintMode="multiply"
+        android:onClick="onDicePlaced"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/button18"
         app:layout_constraintStart_toEndOf="@+id/button16"
         app:layout_constraintTop_toBottomOf="@+id/button12" />
 
-    <Button
+    <com.example.segrada.Die.DiceView
         android:id="@+id/button18"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -264,12 +271,13 @@
         android:layout_marginEnd="4dp"
         android:layout_marginBottom="12dp"
         android:backgroundTintMode="multiply"
+        android:onClick="onDicePlaced"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/button19"
         app:layout_constraintStart_toEndOf="@+id/button17"
         app:layout_constraintTop_toBottomOf="@+id/button13" />
 
-    <Button
+    <com.example.segrada.Die.DiceView
         android:id="@+id/button19"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -278,12 +286,13 @@
         android:layout_marginEnd="4dp"
         android:layout_marginBottom="12dp"
         android:backgroundTintMode="multiply"
+        android:onClick="onDicePlaced"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/button20"
         app:layout_constraintStart_toEndOf="@+id/button18"
         app:layout_constraintTop_toBottomOf="@+id/button14" />
 
-    <Button
+    <com.example.segrada.Die.DiceView
         android:id="@+id/button20"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -292,6 +301,7 @@
         android:layout_marginEnd="12dp"
         android:layout_marginBottom="12dp"
         android:backgroundTintMode="multiply"
+        android:onClick="onDicePlaced"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/divider"
         app:layout_constraintStart_toEndOf="@+id/button19"
@@ -347,99 +357,13 @@
         app:layout_constraintEnd_toStartOf="@+id/divider"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.example.segrada.Die.DiceView
-        android:id="@+id/diceView1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:onClick="onDiceSelected"
-        app:layout_constraintBottom_toTopOf="@+id/diceView2"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/divider"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <com.example.segrada.Die.DiceView
-        android:id="@+id/diceView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="onDiceSelected"
-        app:layout_constraintBottom_toTopOf="@+id/diceView3"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/divider"
-        app:layout_constraintTop_toBottomOf="@+id/diceView1" />
-
-    <com.example.segrada.Die.DiceView
-        android:id="@+id/diceView3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="onDiceSelected"
-        app:layout_constraintBottom_toTopOf="@+id/diceView4"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/divider"
-        app:layout_constraintTop_toBottomOf="@+id/diceView2" />
-
-    <com.example.segrada.Die.DiceView
-        android:id="@+id/diceView4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="onDiceSelected"
-        app:layout_constraintBottom_toTopOf="@+id/diceView5"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/divider"
-        app:layout_constraintTop_toBottomOf="@+id/diceView3" />
-
-    <com.example.segrada.Die.DiceView
-        android:id="@+id/diceView5"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="onDiceSelected"
-        app:layout_constraintBottom_toTopOf="@+id/diceView6"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/divider"
-        app:layout_constraintTop_toBottomOf="@+id/diceView4" />
-
-    <com.example.segrada.Die.DiceView
-        android:id="@+id/diceView6"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="onDiceSelected"
-        app:layout_constraintBottom_toTopOf="@+id/diceView7"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/divider"
-        app:layout_constraintTop_toBottomOf="@+id/diceView5" />
-
-    <com.example.segrada.Die.DiceView
-        android:id="@+id/diceView7"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="onDiceSelected"
-        app:layout_constraintBottom_toTopOf="@+id/diceView8"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/divider"
-        app:layout_constraintTop_toBottomOf="@+id/diceView6" />
-
-    <com.example.segrada.Die.DiceView
-        android:id="@+id/diceView8"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="onDiceSelected"
-        app:layout_constraintBottom_toTopOf="@+id/diceView9"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/divider"
-        app:layout_constraintTop_toBottomOf="@+id/diceView7" />
-
-    <com.example.segrada.Die.DiceView
-        android:id="@+id/diceView9"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp"
-        android:onClick="onDiceSelected"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvDraftPool"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/divider"
-        app:layout_constraintTop_toBottomOf="@+id/diceView8" />
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

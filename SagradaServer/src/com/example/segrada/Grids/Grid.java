@@ -9,9 +9,11 @@ public class Grid implements Serializable {
     private static final long serialVersionUID = 999L;
 
     private GridBlock[][] gridBlocks;
+    private boolean firstDice;
 
     public Grid() {
-        this.gridBlocks = new GridBlock[4][5];
+        gridBlocks = new GridBlock[4][5];
+        firstDice = true;
     }
 
     public void addBlock(int x, int y, GridBlock block){
@@ -23,9 +25,20 @@ public class Grid implements Serializable {
     }
 
     public Grid findValid(Dice dice){
-        for (int x = 0; x < gridBlocks.length; x++)
-            for (int y = 0; y < gridBlocks[x].length; y++)
-                gridBlocks[x][y].validate(dice);
+        if (firstDice) {
+            for (int x = 0; x < gridBlocks.length; x += gridBlocks.length-1)
+                for (int y = 0; y < gridBlocks[x].length; y++)
+                    gridBlocks[x][y].validate(dice);
+            for (int x = 1; x < gridBlocks.length-1; x++)
+                for (int y = 0; y < gridBlocks[x].length; y += gridBlocks[x].length-1)
+                    gridBlocks[x][y].validate(dice);
+
+            firstDice = false;
+        } else {
+            for (int x = 0; x < gridBlocks.length; x++)
+                for (int y = 0; y < gridBlocks[x].length; y++)
+                    gridBlocks[x][y].validate(dice);
+        }
 
         return this;
     }

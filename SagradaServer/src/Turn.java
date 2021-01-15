@@ -1,24 +1,10 @@
-import com.example.segrada.Die.Die;
-
 import java.util.Random;
 
 public class Turn {
-    static private Turn instance;
-
-    private Die draftPool;
     private int player;
 
-    private Turn(){
-        Round round = Round.getInstance();
-        draftPool = round.getDraftPool();
+    public Turn(){
         player = -2; //new Random().nextInt(4);
-    }
-
-    static public Turn getInstance(){
-        if (instance == null)
-            instance = new Turn();
-
-        return instance;
     }
 
     public void nextPlayer(){

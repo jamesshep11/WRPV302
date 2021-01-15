@@ -1,25 +1,25 @@
 package com.example.segrada;
 
 
+import android.content.Context;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.example.segrada.Die.DiceView;
 import com.example.segrada.Grids.Grid;
-import com.example.segrada.Grids.GridBlock;
 import com.example.segrada.Grids.GridView;
 import com.example.segrada.PubSubBroker.Broker;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 
 
 /**
@@ -28,6 +28,7 @@ import java.util.ArrayList;
  * create an instance of this fragment.
  */
 public class GamePlayFragment extends Fragment {
+    private Context context;
     private Broker broker;
     private Game game;
 
@@ -35,12 +36,16 @@ public class GamePlayFragment extends Fragment {
     private boolean active;
     private Grid grid;
     private GridView gridView;
-    private int[] diceViewIDs = {R.id.diceView1, R.id.diceView2, R.id.diceView3, R.id.diceView4, R.id.diceView5, R.id.diceView6, R.id.diceView7, R.id.diceView8, R.id.diceView9};
     private String color;
 
+    private RecyclerView recyclerView;
+    private DraftPoolAdapter mAdapter;
+    private RecyclerView.LayoutManager layoutManager;
+    private boolean rvSet = false;
 
-    public GamePlayFragment() {
-        // Required empty public constructor
+
+    private GamePlayFragment(Context context) {
+        this.context = context;
     }
 
     /**
@@ -50,8 +55,8 @@ public class GamePlayFragment extends Fragment {
      * @param fragNum the fragment number. Corresponds with the player number that this fragment represents.
      * @return A new instance of fragment GamePlayFragment.
      */
-    public static GamePlayFragment newInstance(int fragNum) {
-        GamePlayFragment fragment = new GamePlayFragment();
+    public static GamePlayFragment newInstance(Context context, int fragNum) {
+        GamePlayFragment fragment = new GamePlayFragment(context);
         fragment.game = Game.getInstance(null);
         fragment.broker = Broker.getInstance();
 
@@ -84,7 +89,20 @@ public class GamePlayFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        subToBroker();
+        //region Set up recyclerView
+        if (!rvSet) {
+            recyclerView = getView().findViewById(R.id.rvDraftPool);
+            recyclerView.setHasFixedSize(true);
+
+            layoutManager = new LinearLayoutManager(context);
+            recyclerView.setLayoutManager(layoutManager);
+
+            mAdapter = new DraftPoolAdapter(context);
+            recyclerView.setAdapter(mAdapter);
+        }
+        //endregion
+
+        renderDraftPool();
 
         //region Handle Player# header
         TextView txtPlayer = getView().findViewById(R.id.txtPlayer);
@@ -95,26 +113,11 @@ public class GamePlayFragment extends Fragment {
 
         gridView.connectToUI();
         gridView.loadGrid(grid);
-
-        renderDraftPool();
-
-        setClickable(active);
-    }
-
-    private void subToBroker(){
-
-    }
-
-    public void setClickable(boolean clickable){
-        for (int id : diceViewIDs)
-            getView().findViewById(id).setEnabled(clickable);
     }
 
     private void renderDraftPool(){
-        for (int i = 0; i < diceViewIDs.length; i++){
-            DiceView dice = getView().findViewById(diceViewIDs[i]);
-            dice.setDice(game.getDraftPool().get(i));
-        }
+        mAdapter.setClickable(active);
+        mAdapter.setDraftPool(game.getDraftPool());
     }
 
     private int getResId(String rec, Class<?> aClass) {
@@ -127,6 +130,7 @@ public class GamePlayFragment extends Fragment {
         }
     }
 
+    //region Getter & Setters
     public int getFragNum(){
         return fragNum;
     }
@@ -142,4 +146,5 @@ public class GamePlayFragment extends Fragment {
     public void setActive(boolean active) {
         this.active = active;
     }
+    //endregion
 }

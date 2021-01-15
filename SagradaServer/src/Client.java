@@ -82,6 +82,7 @@ public class Client {
                 while(!isInterrupted()) {
                     Object object = objectsOut.take();
 
+                    oos.reset();
                     oos.writeObject(object);
                     oos.flush();
 

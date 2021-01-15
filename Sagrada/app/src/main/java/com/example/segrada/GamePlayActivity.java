@@ -2,12 +2,17 @@ package com.example.segrada;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.opengl.Visibility;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 
+import com.example.segrada.Die.Dice;
 import com.example.segrada.Die.DiceView;
 import com.example.segrada.Die.Die;
 import com.example.segrada.Grids.Grid;
@@ -15,6 +20,7 @@ import com.example.segrada.PubSubBroker.Broker;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 public class GamePlayActivity extends AppCompatActivity {
 
@@ -22,7 +28,7 @@ public class GamePlayActivity extends AppCompatActivity {
     private Game game = Game.getInstance(null);
     private Broker broker = Broker.getInstance();
 
-    private ArrayList<GamePlayFragment> frags = game.getFrags();
+    static private ArrayList<GamePlayFragment> frags;
     private GamePlayFragment curFrag;
 
     @Override
@@ -31,6 +37,7 @@ public class GamePlayActivity extends AppCompatActivity {
         setContentView(R.layout.activity_game_play);
 
         subToBroker();
+        initFrags();
         curFrag = frags.get(game.getThisPLayer());
         loadFrag(curFrag);
 
@@ -61,16 +68,22 @@ public class GamePlayActivity extends AppCompatActivity {
             frag.setGrid(validSlots);
             refreshFrag(frag);
         });
+        broker.subscribe("diceSelected", (publisher, topic, params) -> onDiceSelected(params));
+
+    }
+
+    private void initFrags(){
+        // Initialize the fragments for each player
+        frags = new ArrayList<>();
+        frags.add(GamePlayFragment.newInstance( this, 0));
+        frags.add(GamePlayFragment.newInstance( this, 1));
+        frags.add(GamePlayFragment.newInstance( this, 2));
+        frags.add(GamePlayFragment.newInstance( this, 3));
     }
 
     private void showRollingAnimation(){
         Intent intent = new Intent(this, RollDiceActivity.class);
         startActivity(intent);
-        loadDieToView();
-    }
-
-    private void loadDieToView(){
-
     }
 
     // Add fragment to container view
@@ -119,9 +132,10 @@ public class GamePlayActivity extends AppCompatActivity {
         loadFrag(curFrag);
     }
 
-    public void onDiceSelected(View view){
-        DiceView diceView = (DiceView)view;
+    private void onDiceSelected(Map<String, Object> param){
+        DiceView diceView = (DiceView)param.get("diceView");
         diceView.setBorder("blue");
+        game.setCurDice(diceView);
 
         new AlertDialog.Builder(this)
                 .setMessage(diceView.getDice().getColor() + " " + diceView.getDice().getValue() + " selected.")
@@ -132,5 +146,23 @@ public class GamePlayActivity extends AppCompatActivity {
         params.put("dice", diceView.getDice());
         params.put("grid", curFrag.getGridView().getGrid());
         server.sendObject(params);
+    }
+
+    public void onDicePlaced(View view){
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("topic", "dicePlaced");
+        params.put("dice", diceView.getDice());
+        params.put("grid", curFrag.getGridView().getGrid());
+        server.sendObject(params);
+
+        DiceView button = (DiceView) view;
+        DiceView diceView = game.getCurDice();
+        Dice dice = diceView.getDice();
+
+        curFrag.getGridView().placeDiceView(button, dice);
+        curFrag.getGridView().setClickable(false);
+
+        game.getDraftPool().remove(dice);
+        refreshFrag(curFrag);
     }
 }

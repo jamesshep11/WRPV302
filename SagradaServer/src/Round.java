@@ -1,24 +1,14 @@
 import com.example.segrada.Die.Die;
 
 public class Round {
-    static private Round instance;
-
-    static private Turn turn;
+    private Turn turn;
     private Die draftPool;
     private int turnCount;
 
-    private Round(){
+    public Round(){
         draftPool = new Die();
         turnCount = 0;
-    }
-
-    static public Round getInstance(){
-        if (instance == null) {
-            instance = new Round();
-            turn = Turn.getInstance();
-        }
-
-        return instance;
+        turn = new Turn();
     }
 
     public void nextRound(Die bag){
