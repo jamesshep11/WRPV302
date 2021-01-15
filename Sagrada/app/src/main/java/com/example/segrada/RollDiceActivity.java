@@ -4,9 +4,12 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.view.View;
+import android.widget.TextView;
 
 import com.example.segrada.Die.DiceView;
 import com.example.segrada.Die.Die;
+import com.example.segrada.Die.Timer;
 import com.example.segrada.PubSubBroker.Broker;
 
 import java.util.HashMap;
@@ -19,17 +22,35 @@ public class RollDiceActivity extends AppCompatActivity {
     private Broker broker = Broker.getInstance();
     private Die die;
 
+    private enum Notice{ROUND, TURN}
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_roll_dice);
 
         die = game.getDraftPool();
-        rollDice();
+        int roundNum = getIntent().getIntExtra("roundNum", 0);
+        rollDice(roundNum);
     }
 
-    private void rollDice(){
+    boolean timeRunning;
+    private void rollDice(int roundNum){
         // Add code to roll dice
+
+        //region Display Round Number
+        TextView txtNotice = findViewById(R.id.txtNotice2);
+        txtNotice.setText(getString(R.string.Round, roundNum));
+        txtNotice.setVisibility(View.VISIBLE);
+
+        timeRunning = true;
+        Runnable tick = () -> {
+            runOnUiThread(() -> txtNotice.setVisibility(View.INVISIBLE));
+            timeRunning = false;
+        };
+        Timer timer = new Timer( 4000, tick, timeRunning);
+        timer.start();
+        //endregion
 
         new AlertDialog.Builder(this)
                 .setMessage("Imagine the dice were rolling.")

@@ -4,7 +4,7 @@ public class Turn {
     private int player;
 
     public Turn(){
-        player = -2; //new Random().nextInt(4);
+        player = -1; //new Random().nextInt(4);
     }
 
     public void nextPlayer(){

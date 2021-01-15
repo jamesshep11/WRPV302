@@ -2,4 +2,6 @@
     <string name="app_name">Sagrada</string>
     <string name="Waiting_for_players">Waiting for players to join</string>
     <string name="Player">Player %1$d</string>
+    <string name="Round">Round %1$d</string>
+    <string name="Turn">Player %1$d\'s \nTurn</string>
 </resources>

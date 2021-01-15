@@ -53,6 +53,13 @@ public class Game {
             newParams.put("validSlots", validSlots);
             clients.get(round.getPlayer()).sendObject(newParams);
         });
+        broker.subscribe("DicePlaced", (publisher, topic, params) -> {
+            params.put("player", round.getPlayer());
+            sendToAll(params);
+        });
+        broker.subscribe("EndTurn", (publisher, topic, params) -> {
+            nextTurn();
+        });
 
         broker.subscribe("EndGame", (publisher, topic, params) -> endGame());
     }
@@ -87,14 +94,14 @@ public class Game {
     private void nextRound(){
         // Initialize a new round
         round.nextRound(bag);
+        roundCount++;
 
         // Notify clients to start round
         HashMap<String, Object> params = new HashMap<>();
         params.put("topic", "StartRound");
         params.put("draftPool", round.getDraftPool());
+        params.put("round", roundCount);
         sendToAll(params);
-
-        roundCount++;
     }
 
     private void nextTurn(){

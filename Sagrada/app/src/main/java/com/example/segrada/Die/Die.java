@@ -56,6 +56,10 @@ public class Die implements Serializable {
         return die.get(pos);
     }
 
+    public int find(Dice dice){
+        return die.indexOf(dice);
+    }
+
     public void clear(){
         die.clear();
     }

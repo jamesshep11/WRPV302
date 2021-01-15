@@ -45,6 +45,10 @@ public class Game {
         return grids;
     }
 
+    public void setGrid(int pos, Grid grid){
+        grids.set(pos, grid);
+    }
+
     public String getColor() {
         return color;
     }
