@@ -34,7 +34,7 @@ public class ResultsActivity extends AppCompatActivity {
         for (int i = 0; i < scores.size(); i++)
             scores.get(i).setPlayerNum(i+1);
         Collections.sort(scores, (score1, score2) -> score1.getTotal() - score2.getTotal());
-        
+
         recyclerView = findViewById(R.id.rvDraftPool);
         recyclerView.setHasFixedSize(true);
 

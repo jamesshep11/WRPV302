@@ -11,7 +11,7 @@ public class Game {
     private final Broker serverBroker;
     private final Broker broker;
 
-    static int numPlayers = 1;
+    static int numPlayers = 2;
     private final String[] colors = {"blue", "yellow", "purple", "red", "green"};
     private final ArrayList<Client> clients;
     private final ArrayList<Grid> grids = Main.getGrids();
@@ -97,10 +97,7 @@ public class Game {
         params.put("color3", colors[2]);
         params.put("color4", colors[3]);
 
-        for(int i = 0; i < clients.size(); i++){
-            params.put("player", i);
-            clients.get(i).sendObject(params);
-        }
+        sendToAll(params);
     }
 
     private void nextRound(){

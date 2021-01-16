@@ -27,7 +27,7 @@ public class Game {
         grids.add((Grid)params.get("grid4"));
 
         // Extract this player's playerNum from params
-        thisPlayer = (int)params.get("player");
+        thisPlayer = (int)params.get("playerNum");
 
         // Extract the colors from params
         color = (String)params.get("color"+(thisPlayer+1));

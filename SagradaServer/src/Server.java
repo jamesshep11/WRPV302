@@ -10,6 +10,7 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 public class Server {
@@ -46,6 +47,11 @@ public class Server {
 				//Create client using global values from waitingForConn() and getStreams()
 				Client client = new Client(connection, gameBroker);
 				clients.add(client);
+
+				HashMap<String, Object>params = new HashMap<>();
+				params.put("topic", "PlayerNum");
+				params.put("playerNum", clients.size()-1);
+				client.sendObject(params);
 
 				System.out.println("Added client #" + clients.size());
 			}

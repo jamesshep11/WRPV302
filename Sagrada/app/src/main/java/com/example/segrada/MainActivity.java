@@ -20,6 +20,8 @@ public class MainActivity extends AppCompatActivity {
     public static int SCREEN_WIDTH;
     public static int SCREEN_HEIGHT;
 
+    private int playerNum;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,7 +50,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void subToBroker(){
+        broker.subscribe("PlayerNum", (publisher, topic, params) -> playerNum = (int)params.get("playerNum"));
         broker.subscribe("StartGame", (publisher, topic, params) -> {
+            params.put("playerNum", playerNum);
             Game.getInstance(params);
             openGamePlayActivity();
             finish();
