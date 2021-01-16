@@ -4,4 +4,11 @@
     <string name="Player">Player %1$d</string>
     <string name="Round">Round %1$d</string>
     <string name="Turn">Player %1$d\'s \nTurn</string>
+
+    <string name="PlayerColor">Player Color = %1$d</string>
+    <string name="Holes">Holes = %1$d</string>
+    <string name="Columns">Columns = %1$d</string>
+    <string name="Pairs56">5+6 Pairs =  %1$d</string>
+    <string name="ColorSets">Colour Sets = %1$d</string>
+    <string name="Total">Total</string>
 </resources>

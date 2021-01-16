@@ -22,8 +22,6 @@ public class RollDiceActivity extends AppCompatActivity {
     private Broker broker = Broker.getInstance();
     private Die die;
 
-    private enum Notice{ROUND, TURN}
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

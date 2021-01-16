@@ -35,8 +35,7 @@ public class GamePlayActivity extends AppCompatActivity {
 
     static private ArrayList<GamePlayFragment> frags;
     private GamePlayFragment curFrag;
-
-    private enum Notice{ROUND, TURN}
+    private Map<String, Object> tempParams;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +76,15 @@ public class GamePlayActivity extends AppCompatActivity {
         });
         broker.subscribe("diceSelected", (publisher, topic, params) -> onDiceSelected(params));
         broker.subscribe("DicePlaced", (publisher, topic, params) -> dicePlaced(params));
+        broker.subscribe("FinishGame", (publisher, topic, params) -> finishGame());
+        broker.subscribe("ShowScores", (publisher, topic, params) -> {
+            tempParams = params;
+            Intent intent = new Intent(this, ResultsActivity.class);
+            startActivity(intent);
+        });
+        broker.subscribe("getResults", (publisher, topic, params) -> {
+            broker.publish(this, "loadResults", tempParams);
+        });
     }
 
     private void initFrags(){
@@ -141,22 +149,6 @@ public class GamePlayActivity extends AppCompatActivity {
         server.sendObject(params);
     }
 
-    private void dicePlaced(Map<String, Object> params){
-        int player = (int) params.get("player");
-        Grid grid = (Grid) params.get("grid");
-        int dicePos = (int) params.get("dice");
-        Dice dice = game.getDraftPool().get(dicePos);
-
-        game.getDraftPool().remove(dice);
-
-        frags.get(player).setGrid(grid);
-        refreshFrag(curFrag);
-
-        HashMap<String, Object> newParams = new HashMap<>();
-        newParams.put("topic", "EndTurn");
-        server.sendObject(newParams);
-    }
-
     public void PlaceDice(View view){
         DiceView button = (DiceView) view;
         DiceView diceView = game.getCurDice();
@@ -170,6 +162,30 @@ public class GamePlayActivity extends AppCompatActivity {
         params.put("topic", "DicePlaced");
         params.put("dice", game.getDraftPool().find(dice));
         params.put("grid", curFrag.getGridView().getGrid());
+        server.sendObject(params);
+    }
+
+    private void dicePlaced(Map<String, Object> params){
+        int player = (int) params.get("player");
+        Grid grid = (Grid) params.get("grid");
+        int dicePos = (int) params.get("dice");
+        Dice dice = game.getDraftPool().get(dicePos);
+
+        game.getDraftPool().remove(dice);
+        game.setGrid(player, grid);
+
+        frags.get(player).setGrid(grid);
+        refreshFrag(curFrag);
+
+        HashMap<String, Object> newParams = new HashMap<>();
+        newParams.put("topic", "EndTurn");
+        server.sendObject(newParams);
+    }
+
+    private void finishGame(){
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("topic", "CalcScores");
+        params.put("grids", game.getGrids());
         server.sendObject(params);
     }
 

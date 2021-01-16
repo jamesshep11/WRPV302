@@ -66,7 +66,6 @@ public class DraftPoolAdapter extends RecyclerView.Adapter<DraftPoolAdapter.dice
     }
 
     public static class diceViewHolder extends RecyclerView.ViewHolder {
-        // each data item is just a string in this case
         DiceView diceView;
 
         public diceViewHolder(View parentView) {

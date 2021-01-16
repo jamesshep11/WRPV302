@@ -3,6 +3,7 @@ import com.example.segrada.Die.Dice;
 import com.example.segrada.Die.Die;
 import com.example.segrada.Grids.Grid;
 import com.example.segrada.Grids.GridBlock;
+import com.example.segrada.Score;
 
 import java.util.*;
 
@@ -34,17 +35,21 @@ public class Game {
         startGame();
     }
 
-    private int numGamesStarted = 0, numRoundsStarted = 0;
+    private int counter = 0;
     private void subToBroker(){
         broker.subscribe("GameStarted", (publisher, topic, params) -> {
-            numGamesStarted++;
-            if (numGamesStarted == numPlayers)
+            counter++;
+            if (counter == numPlayers) {
                 nextRound();
+                counter = 0;
+            }
         });
         broker.subscribe("RoundStarted", (publisher, topic, params) -> {
-            numRoundsStarted++;
-            if (numRoundsStarted == numPlayers)
+            counter++;
+            if (counter == numPlayers) {
                 nextTurn();
+                counter = 0;
+            }
         });
         broker.subscribe("GetValidSlots", (publisher, topic, params) -> {
             Grid validSlots = getAvailableSlots(params);
@@ -59,6 +64,13 @@ public class Game {
         });
         broker.subscribe("EndTurn", (publisher, topic, params) -> {
             nextTurn();
+        });
+        broker.subscribe("CalcScores", (publisher, topic, params) -> {
+            counter++;
+            if (counter > numPlayers){
+                calcScores(params);
+                counter = 0;
+            }
         });
 
         broker.subscribe("EndGame", (publisher, topic, params) -> endGame());
@@ -93,8 +105,12 @@ public class Game {
 
     private void nextRound(){
         // Initialize a new round
-        round.nextRound(bag);
         roundCount++;
+        if (roundCount > 10){
+            finishGame();
+            return;
+        }
+        round.nextRound(bag);
 
         // Notify clients to start round
         HashMap<String, Object> params = new HashMap<>();
@@ -128,6 +144,24 @@ public class Game {
     private void sendToAll(Map<String, Object> params){
         for (Client client : clients)
             client.sendObject(params);
+    }
+
+    private void finishGame(){
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("topic", "FinishGame");
+        sendToAll(params);
+    }
+
+    private void calcScores(Map<String, Object> params){
+        ArrayList<Score> scores = new ArrayList<>();
+        ArrayList<Grid> grids = (ArrayList<Grid>) params.get("grids");
+        for (int i = 0; i < grids.size(); i++)
+            scores.add(grids.get(i).calcScore(colors[i]));
+
+        HashMap<String, Object> newParams = new HashMap<>();
+        newParams.put("topic", "ShowScores");
+        newParams.put("scores", scores);
+        sendToAll(newParams);
     }
 
     private void endGame(){
