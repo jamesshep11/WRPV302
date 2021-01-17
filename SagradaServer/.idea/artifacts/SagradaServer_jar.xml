@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="SagradaServer:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/SagradaServer_jar</output-path>
+    <root id="archive" name="SagradaServer.jar">
+      <element id="module-output" name="SagradaServer" />
+    </root>
+  </artifact>
+</component>
