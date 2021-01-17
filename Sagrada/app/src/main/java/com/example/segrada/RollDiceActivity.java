@@ -39,11 +39,10 @@ public class RollDiceActivity extends AppCompatActivity {
         //region Display Round Number
         TextView txtNotice = findViewById(R.id.txtNotice2);
         txtNotice.setText(getString(R.string.Round, roundNum));
-        txtNotice.setVisibility(View.VISIBLE);
 
         timeRunning = true;
         Runnable tick = () -> {
-            runOnUiThread(() -> txtNotice.setVisibility(View.INVISIBLE));
+            runOnUiThread(() -> txtNotice.setText(""));
             timeRunning = false;
         };
         Timer timer = new Timer( 4000, tick, timeRunning);

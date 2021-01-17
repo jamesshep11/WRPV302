@@ -46,7 +46,7 @@ public class ScoreAdapter extends RecyclerView.Adapter<ScoreAdapter.scoreViewHol
         holder.txtColumns.setText(context.getString(R.string.Columns, score.getColumns()));
         holder.txtPairs56.setText(context.getString(R.string.Pairs56, score.getPair56()));
         holder.txtColorSets.setText(context.getString(R.string.ColorSets, score.getColorSets()));
-        holder.txtScore.setText(context.getString(score.getTotal()));
+        holder.txtScore.setText(Integer.toString(score.getTotal()));
     }
 
     @Override

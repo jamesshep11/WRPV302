@@ -35,7 +35,7 @@ public class ResultsActivity extends AppCompatActivity {
             scores.get(i).setPlayerNum(i+1);
         Collections.sort(scores, (score1, score2) -> score1.getTotal() - score2.getTotal());
 
-        recyclerView = findViewById(R.id.rvDraftPool);
+        recyclerView = findViewById(R.id.rvScores);
         recyclerView.setHasFixedSize(true);
 
         layoutManager = new LinearLayoutManager(this);

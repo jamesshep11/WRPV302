@@ -13,6 +13,7 @@ public class Round {
 
     public void nextRound(Die bag){
         turnCount = 0;
+        turn.nextPlayer();
 
         // Pick die to make the draft pool
         draftPool.clear();

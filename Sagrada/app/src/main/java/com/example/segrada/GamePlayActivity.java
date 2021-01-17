@@ -66,15 +66,15 @@ public class GamePlayActivity extends AppCompatActivity {
             thisPlayersFrag.setActive(player == game.getThisPLayer());
             if (player == game.getThisPLayer())
                 checkSkippable();
-            refreshFrag(thisPlayersFrag);
+            refreshFrag(curFrag);
 
             runOnUiThread(() -> showNotice(player));
         });
         broker.subscribe("Skippable", (publisher, topic, params) -> {
             boolean skippable = (boolean) params.get("skippable");
             GamePlayFragment thisPlayersFrag = frags.get(game.getThisPLayer());
-            thisPlayersFrag.setSkippable(skippable);
-            refreshFrag(thisPlayersFrag);
+            thisPlayersFrag.setSkippable(true);
+            refreshFrag(curFrag);
         });
         broker.subscribe("diceSelected", (publisher, topic, params) -> onDiceSelected(params));
         broker.subscribe("ValidSlots", (publisher, topic, params) ->    {
@@ -178,6 +178,8 @@ public class GamePlayActivity extends AppCompatActivity {
 
         frags.get(player).setGrid(grid);
         refreshFrag(curFrag);
+
+        runOnUiThread(() -> ((TextView)findViewById(R.id.txtNotice)).setText(""));
 
         HashMap<String, Object> newParams = new HashMap<>();
         newParams.put("topic", "EndTurn");

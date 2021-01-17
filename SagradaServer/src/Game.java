@@ -11,13 +11,13 @@ public class Game {
     private final Broker serverBroker;
     private final Broker broker;
 
-    static int numPlayers = 2;
+    static int numPlayers = 4;
     private final String[] colors = {"blue", "yellow", "purple", "red", "green"};
     private final ArrayList<Client> clients;
     private final ArrayList<Grid> grids = Main.getGrids();
     private Die bag = fillBag();
     private Round round;
-    private int roundCount = 0;
+    private int roundCount = 9;
 
     public Game(ArrayList<Client> clients, Broker broker, Broker serverBroker) {
         this.clients = clients;
@@ -75,7 +75,7 @@ public class Game {
         broker.subscribe("SkipTurn", (publisher, topic, params) -> nextTurn());
         broker.subscribe("CalcScores", (publisher, topic, params) -> {
             counter++;
-            if (counter > numPlayers){
+            if (counter == numPlayers){
                 calcScores(params);
                 counter = 0;
             }
