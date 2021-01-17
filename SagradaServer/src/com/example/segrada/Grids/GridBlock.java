@@ -53,6 +53,10 @@ public class GridBlock implements Serializable {
             valid = false;
     }
 
+    public void inValidate(){
+        valid = false;
+    }
+
     //region Getters & Setters
     public String getColor() {
         return color;
@@ -77,5 +81,10 @@ public class GridBlock implements Serializable {
     public void setSet(boolean set) {
         this.set = set;
     }
+
+    public boolean isValid() {
+        return valid;
+    }
+
     //endregion
 }

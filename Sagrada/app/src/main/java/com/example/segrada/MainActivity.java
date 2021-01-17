@@ -41,10 +41,10 @@ public class MainActivity extends AppCompatActivity {
                 .setTitle("Network")
                 .setMessage("Please enter the server address you would like to connect to:")
                 .setView(input)
-                .setPositiveButton("OK", ((dialog, which) -> {
+                .setPositiveButton("OK", (dialog, which) -> {
                     serverAddress = input.getText().toString();
                     server = ClientController.getInstance(serverAddress);
-                }))
+                })
                 .show();
         //endregion
     }

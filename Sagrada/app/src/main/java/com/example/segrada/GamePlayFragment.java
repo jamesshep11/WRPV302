@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.segrada.Grids.Grid;
@@ -34,6 +35,7 @@ public class GamePlayFragment extends Fragment {
 
     private int fragNum;
     private boolean active;
+    private boolean skippable = false;
     private Grid grid;
     private GridView gridView;
     private String color;
@@ -111,6 +113,11 @@ public class GamePlayFragment extends Fragment {
         txtPlayer.setBackgroundColor(getResources().getColor(colorResId));
         //endregion
 
+        Button btnSkip = getView().findViewById(R.id.btnSkip);
+        btnSkip.setEnabled(active && skippable);
+        if (fragNum != game.getThisPLayer())
+            btnSkip.setVisibility(View.INVISIBLE);
+
         gridView.connectToUI();
         gridView.loadGrid(grid);
     }
@@ -146,5 +153,10 @@ public class GamePlayFragment extends Fragment {
     public void setActive(boolean active) {
         this.active = active;
     }
+
+    public void setSkippable(boolean skippable) {
+        this.skippable = skippable;
+    }
+
     //endregion
 }

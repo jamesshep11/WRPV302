@@ -31,19 +31,81 @@ public class Grid implements Serializable {
         if (firstDice) {
             for (int x = 0; x < gridBlocks.length; x += gridBlocks.length-1)
                 for (int y = 0; y < gridBlocks[x].length; y++)
-                    gridBlocks[x][y].validate(dice);
+                    if (surroundingsFine(x, y, dice))
+                        gridBlocks[x][y].validate(dice);
+                    else
+                        gridBlocks[x][y].inValidate();
             for (int x = 1; x < gridBlocks.length-1; x++)
                 for (int y = 0; y < gridBlocks[x].length; y += gridBlocks[x].length-1)
-                    gridBlocks[x][y].validate(dice);
-
-            firstDice = false;
+                    if (surroundingsFine(x, y, dice))
+                        gridBlocks[x][y].validate(dice);
+                    else
+                        gridBlocks[x][y].inValidate();
         } else {
             for (int x = 0; x < gridBlocks.length; x++)
                 for (int y = 0; y < gridBlocks[x].length; y++)
-                    gridBlocks[x][y].validate(dice);
+                    if (isNextedToDice(x, y) && surroundingsFine(x, y, dice))
+                        gridBlocks[x][y].validate(dice);
+                    else
+                        gridBlocks[x][y].inValidate();
         }
 
         return this;
+    }
+
+    private boolean surroundingsFine(int x, int y, Dice dice){
+        // check above
+        if (x-1 >= 0 && (gridBlocks[x-1][y].getColor().equals(dice.getColor()) || gridBlocks[x-1][y].getValue() == dice.getValue()))
+            return false;
+        // check below
+        if (x+1 < gridBlocks.length && (gridBlocks[x+1][y].getColor().equals(dice.getColor()) || gridBlocks[x+1][y].getValue() == dice.getValue()))
+            return false;
+        // check left
+        if (y-1 >= 0 && (gridBlocks[x][y-1].getColor().equals(dice.getColor()) || gridBlocks[x][y-1].getValue() == dice.getValue()))
+            return false;
+        // check right
+        if (y+1 < gridBlocks[x].length && (gridBlocks[x][y+1].getColor().equals(dice.getColor()) || gridBlocks[x][y+1].getValue() == dice.getValue()))
+            return false;
+
+        return true;
+    }
+
+    private boolean isNextedToDice(int x, int y){
+        // check top-left
+        if (x-1 >= 0 && y-1 >= 0 && gridBlocks[x-1][y-1].isSet())
+            return true;
+        // check top
+        if (x-1 >= 0 && (gridBlocks[x-1][y].isSet()))
+            return true;
+        // check top-right
+        if (x-1 >= 0 && y+1 < gridBlocks[x].length && gridBlocks[x-1][y+1].isSet())
+            return true;
+        // check right
+        if (y+1 < gridBlocks[x].length && (gridBlocks[x][y+1].isSet()))
+            return true;
+        // check bottom right
+        if (x+1 < gridBlocks.length && y+1 < gridBlocks[x].length && gridBlocks[x+1][y+1].isSet())
+            return true;
+        // check bottom
+        if (x+1 < gridBlocks.length && (gridBlocks[x+1][y].isSet()))
+            return true;
+        // check bottom left
+        if (x+1 < gridBlocks.length && y-1 >= 0 && gridBlocks[x+1][y-1].isSet())
+            return true;
+        // check left
+        if (y-1 >= 0 && (gridBlocks[x][y-1].isSet()))
+            return true;
+
+        return false;
+    }
+
+    public boolean hasValid(){
+        for (int x = 0; x < gridBlocks.length; x++)
+            for (int y = 0; y < gridBlocks[x].length; y++)
+                if (gridBlocks[x][y].isValid())
+                    return true;
+
+        return false;
     }
 
     public GridBlock[][] getGridBlocks() {
@@ -133,5 +195,9 @@ public class Grid implements Serializable {
         score.calcScore();
 
         return score;
+    }
+
+    public void setFirstDice(boolean val){
+        firstDice = val;
     }
 }

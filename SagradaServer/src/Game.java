@@ -51,6 +51,7 @@ public class Game {
                 counter = 0;
             }
         });
+        broker.subscribe("CheckSkippable", (publisher, topic, params) -> checkSkippable(params));
         broker.subscribe("GetValidSlots", (publisher, topic, params) -> {
             Grid validSlots = getAvailableSlots(params);
             HashMap<String, Object> newParams = new HashMap<>();
@@ -59,12 +60,19 @@ public class Game {
             clients.get(round.getPlayer()).sendObject(newParams);
         });
         broker.subscribe("DicePlaced", (publisher, topic, params) -> {
+            ((Grid)params.get("grid")).setFirstDice(false);
+
             params.put("player", round.getPlayer());
             sendToAll(params);
         });
         broker.subscribe("EndTurn", (publisher, topic, params) -> {
-            nextTurn();
+            counter++;
+            if (counter == numPlayers) {
+                nextTurn();
+                counter = 0;
+            }
         });
+        broker.subscribe("SkipTurn", (publisher, topic, params) -> nextTurn());
         broker.subscribe("CalcScores", (publisher, topic, params) -> {
             counter++;
             if (counter > numPlayers){
@@ -138,9 +146,13 @@ public class Game {
         return grid.findValid(dice);
     }
 
-    private void sendToAll(Map<String, Object> params){
-        for (Client client : clients)
-            client.sendObject(params);
+    private void checkSkippable(Map<String, Object> params){
+        Grid validSlots = getAvailableSlots(params);
+
+        HashMap<String, Object> newParams = new HashMap<>();
+        newParams.put("topic", "Skippable");
+        newParams.put("skippable", !validSlots.hasValid());
+        clients.get(round.getPlayer()).sendObject(newParams);
     }
 
     private void finishGame(){
@@ -168,5 +180,10 @@ public class Game {
         broker.publish(this, "CloseConnection", null);
 
         serverBroker.publish(this, "EndGame", null);
+    }
+
+    private void sendToAll(Map<String, Object> params){
+        for (Client client : clients)
+            client.sendObject(params);
     }
 }

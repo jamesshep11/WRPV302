@@ -9,14 +9,14 @@ public class Turn {
 
     public void nextPlayer(){
         // Select the next player to start the round
-        if (player == 3)
+        if (player == Game.numPlayers-1)
             player = -1;
         player++;
     }
 
     public void prevPlayer(){
         if (player == 0)
-            player = 4;
+            player = Game.numPlayers;
         player--;
     }
 

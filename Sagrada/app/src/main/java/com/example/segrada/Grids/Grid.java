@@ -25,6 +25,15 @@ public class Grid implements Serializable {
                 gridBlocks[x][y].setValid(false);
     }
 
+    public boolean hasValid(){
+        for (int x = 0; x < gridBlocks.length; x++)
+            for (int y = 0; y < gridBlocks[x].length; y++)
+                if (gridBlocks[x][y].isValid())
+                    return true;
+
+        return false;
+    }
+
     public GridBlock getAt(int x, int y){
         return gridBlocks[x][y];
     }

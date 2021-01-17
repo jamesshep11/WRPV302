@@ -64,17 +64,19 @@ public class GamePlayActivity extends AppCompatActivity {
             int player = (int)params.get("player");
             GamePlayFragment thisPlayersFrag = frags.get(game.getThisPLayer());
             thisPlayersFrag.setActive(player == game.getThisPLayer());
+            thisPlayersFrag.setSkippable(checkSkippable());
+            refreshFrag(thisPlayersFrag);
 
             runOnUiThread(() -> showNotice(player));
         });
-        broker.subscribe("ValidSlots", (publisher, topic, params) -> {
+        broker.subscribe("diceSelected", (publisher, topic, params) -> onDiceSelected(params));
+        broker.subscribe("ValidSlots", (publisher, topic, params) ->    {
             Grid validSlots = (Grid) params.get("validSlots");
 
             GamePlayFragment frag = frags.get(game.getThisPLayer());
             frag.setGrid(validSlots);
             refreshFrag(frag);
         });
-        broker.subscribe("diceSelected", (publisher, topic, params) -> onDiceSelected(params));
         broker.subscribe("DicePlaced", (publisher, topic, params) -> dicePlaced(params));
         broker.subscribe("FinishGame", (publisher, topic, params) -> finishGame());
         broker.subscribe("ShowScores", (publisher, topic, params) -> {
@@ -102,19 +104,9 @@ public class GamePlayActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    boolean timeRunning;
     private void showNotice(int num){
         TextView txtNotice = findViewById(R.id.txtNotice);
         txtNotice.setText(getString(R.string.Turn, num+1));
-        txtNotice.setVisibility(View.VISIBLE);
-
-        timeRunning = true;
-        Runnable tick = () -> {
-            runOnUiThread(() -> txtNotice.setVisibility(View.INVISIBLE));
-            timeRunning = false;
-        };
-        Timer timer = new Timer( 4000, tick, timeRunning);
-        timer.start();
     }
 
     // Add fragment to container view
@@ -130,12 +122,15 @@ public class GamePlayActivity extends AppCompatActivity {
                 .beginTransaction()
                 .detach(frag)
                 .attach(frag)
-                .commit();
+                .commitAllowingStateLoss();
     }
 
     private void onDiceSelected(Map<String, Object> param){
         DiceView diceView = (DiceView)param.get("diceView");
         diceView.setBorder("blue");
+        DiceView curDice = game.getCurDice();
+        if (curDice != null)
+            curDice.setBorder(null);
         game.setCurDice(diceView);
 
         new AlertDialog.Builder(this)
@@ -145,7 +140,7 @@ public class GamePlayActivity extends AppCompatActivity {
         HashMap<String, Object> params = new HashMap<>();
         params.put("topic", "GetValidSlots");
         params.put("dice", diceView.getDice());
-        params.put("grid", curFrag.getGridView().getGrid());
+        params.put("grid", game.getGrids().get(game.getThisPLayer()));
         server.sendObject(params);
     }
 
@@ -192,6 +187,8 @@ public class GamePlayActivity extends AppCompatActivity {
     // Calc and display next frag
     public void nextFrag(View view){
         frags.get(game.getThisPLayer()).getGridView().getGrid().invalidateAll();
+        frags.get(game.getThisPLayer()).setSkippable(false);
+
         int pos = curFrag.getFragNum();   // pos of current frag in list
         // find pos of next frag
         switch (pos){
@@ -207,6 +204,8 @@ public class GamePlayActivity extends AppCompatActivity {
     // Calc and display prev frag
     public void prevFrag(View view){
         frags.get(game.getThisPLayer()).getGridView().getGrid().invalidateAll();
+        frags.get(game.getThisPLayer()).setSkippable(false);
+
         int pos = curFrag.getFragNum();   // pos of current frag in list
         // find pos of prev frag
         switch (pos){
@@ -217,5 +216,39 @@ public class GamePlayActivity extends AppCompatActivity {
 
         curFrag = frags.get(pos);
         loadFrag(curFrag);
+    }
+
+    private boolean skippable;
+    private boolean checkSkippable(){
+        skippable = true;
+
+        broker.subscribe("Skippable", (publisher, topic, params) -> {
+            boolean canSkip = (boolean)params.get("skippable");
+            if (!canSkip)
+                skippable = false;
+        });
+
+        Die draftPool = game.getDraftPool();
+        for (int i = 0; i < draftPool.count(); i++) {
+            HashMap<String, Object> params = new HashMap<>();
+            params.put("topic", "CheckSkippable");
+            params.put("dice", draftPool.get(i));
+            params.put("grid", game.getGrids().get(game.getThisPLayer()));
+            server.sendObject(params);
+        }
+
+        return skippable;
+    }
+
+    public void skipTurn(View view){
+        new AlertDialog.Builder(this)
+                .setMessage("Are you sure you want to skip your turn?")
+                .setNegativeButton("No", null)
+                .setPositiveButton("Yes", (dialog, which) -> {
+                    HashMap<String, Object> params = new HashMap<>();
+                    params.put("topic", "SkipTurn");
+                    server.sendObject(params);
+                })
+                .show();
     }
 }

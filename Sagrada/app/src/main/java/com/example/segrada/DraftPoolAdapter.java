@@ -17,14 +17,13 @@ import java.util.HashMap;
 public class DraftPoolAdapter extends RecyclerView.Adapter<DraftPoolAdapter.diceViewHolder> {
 
     private Context context;
-    private Die draftPool;
+    private Die draftPool = new Die();
     private Broker broker;
     private boolean clickable = false;
 
     public DraftPoolAdapter(Context context) {
         this.context = context;
         this.broker = Broker.getInstance();
-        this.draftPool = new Die();
     }
 
 

@@ -69,11 +69,12 @@ public class GridView {
     }
 
     public void placeDiceView(DiceView button, Dice dice){
-
+        // Update view
         button.setBackground(context.getResources().getDrawable(dieVals[dice.getValue()]));
         int colorResId = getResId(dice.getColor(), R.color.class);
         button.setBackgroundTintList(context.getResources().getColorStateList(colorResId));
 
+        // update grid
         for (int x = 0; x < buttons.length; x++)
             for (int y = 0; y < buttons[x].length; y++)
                 if (buttons[x][y].getId() == button.getId()) {

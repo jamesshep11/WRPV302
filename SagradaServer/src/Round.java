@@ -33,9 +33,9 @@ public class Round {
 
     public void nextTurn(){
         turnCount++;
-        if (turnCount < 5)
+        if (turnCount < Game.numPlayers+1)
             turn.nextPlayer();
-        else if (turnCount > 5)
+        else if (turnCount > Game.numPlayers+1)
             turn.prevPlayer();
     }
 
