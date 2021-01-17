@@ -28,6 +28,8 @@ public class Client {
         this.broker = broker;
         getStreams();
 
+        this.broker.subscribe("connectionLost", (publisher, topic, params) -> readThread.interrupt());
+
         readThread = new ReadThread();
         readThread.start();
         writeThread = new WriteThread();
@@ -106,6 +108,7 @@ public class Client {
             connection.close();
 
             writeThread.interrupt();
+            broker.publish(this, "connectionLost", null);
         } catch (IOException e) {
             e.printStackTrace();
         }

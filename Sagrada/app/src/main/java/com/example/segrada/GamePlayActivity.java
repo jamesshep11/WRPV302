@@ -90,10 +90,13 @@ public class GamePlayActivity extends AppCompatActivity {
             tempParams = params;
             Intent intent = new Intent(this, ResultsActivity.class);
             startActivity(intent);
+            finish();
         });
         broker.subscribe("getResults", (publisher, topic, params) -> {
             broker.publish(this, "loadResults", tempParams);
         });
+
+        broker.subscribe("CloseConnection", (publisher, topic, params) -> finish());
     }
 
     private void initFrags(){
@@ -247,5 +250,14 @@ public class GamePlayActivity extends AppCompatActivity {
                     server.sendObject(params);
                 })
                 .show();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("topic", "CloseConnection");
+        server.sendObject(params);
     }
 }

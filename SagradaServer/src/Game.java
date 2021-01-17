@@ -17,7 +17,7 @@ public class Game {
     private final ArrayList<Grid> grids = Main.getGrids();
     private Die bag = fillBag();
     private Round round;
-    private int roundCount = 9;
+    private int roundCount = 0;
 
     public Game(ArrayList<Client> clients, Broker broker, Broker serverBroker) {
         this.clients = clients;
@@ -81,7 +81,11 @@ public class Game {
             }
         });
 
-        broker.subscribe("EndGame", (publisher, topic, params) -> endGame());
+        broker.subscribe("connectionLost", (publisher, topic, params) -> {
+            counter++;
+            if (counter == numPlayers)
+                endGame();
+        });
     }
 
     private Die fillBag(){
@@ -183,9 +187,8 @@ public class Game {
 
     private void endGame(){
         HashMap<String, Object> params = new HashMap<>();
-        params.put("topic", "EndGame");
+        params.put("topic", "CloseConnection");
         sendToAll(params);
-        broker.publish(this, "CloseConnection", null);
 
         serverBroker.publish(this, "EndGame", null);
     }
