@@ -147,11 +147,19 @@ public class Game {
     }
 
     private void checkSkippable(Map<String, Object> params){
-        Grid validSlots = getAvailableSlots(params);
+        boolean skippable = true;
+
+        Die draftPool = (Die) params.get("draftPool");
+        for (int i = 0; i < draftPool.count(); i++) {
+            params.put("dice", draftPool.get(i));
+            Grid validSlots = getAvailableSlots(params);
+            if (validSlots.hasValid())
+                skippable = false;
+        }
 
         HashMap<String, Object> newParams = new HashMap<>();
         newParams.put("topic", "Skippable");
-        newParams.put("skippable", !validSlots.hasValid());
+        newParams.put("skippable", skippable);
         clients.get(round.getPlayer()).sendObject(newParams);
     }
 

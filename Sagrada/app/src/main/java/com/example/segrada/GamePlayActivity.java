@@ -64,10 +64,17 @@ public class GamePlayActivity extends AppCompatActivity {
             int player = (int)params.get("player");
             GamePlayFragment thisPlayersFrag = frags.get(game.getThisPLayer());
             thisPlayersFrag.setActive(player == game.getThisPLayer());
-            thisPlayersFrag.setSkippable(checkSkippable());
+            if (player == game.getThisPLayer())
+                checkSkippable();
             refreshFrag(thisPlayersFrag);
 
             runOnUiThread(() -> showNotice(player));
+        });
+        broker.subscribe("Skippable", (publisher, topic, params) -> {
+            boolean skippable = (boolean) params.get("skippable");
+            GamePlayFragment thisPlayersFrag = frags.get(game.getThisPLayer());
+            thisPlayersFrag.setSkippable(skippable);
+            refreshFrag(thisPlayersFrag);
         });
         broker.subscribe("diceSelected", (publisher, topic, params) -> onDiceSelected(params));
         broker.subscribe("ValidSlots", (publisher, topic, params) ->    {
@@ -218,26 +225,14 @@ public class GamePlayActivity extends AppCompatActivity {
         loadFrag(curFrag);
     }
 
-    private boolean skippable;
-    private boolean checkSkippable(){
-        skippable = true;
-
-        broker.subscribe("Skippable", (publisher, topic, params) -> {
-            boolean canSkip = (boolean)params.get("skippable");
-            if (!canSkip)
-                skippable = false;
-        });
-
+    private void checkSkippable(){
         Die draftPool = game.getDraftPool();
-        for (int i = 0; i < draftPool.count(); i++) {
-            HashMap<String, Object> params = new HashMap<>();
-            params.put("topic", "CheckSkippable");
-            params.put("dice", draftPool.get(i));
-            params.put("grid", game.getGrids().get(game.getThisPLayer()));
-            server.sendObject(params);
-        }
 
-        return skippable;
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("topic", "CheckSkippable");
+        params.put("draftPool", draftPool);
+        params.put("grid", game.getGrids().get(game.getThisPLayer()));
+        server.sendObject(params);
     }
 
     public void skipTurn(View view){
